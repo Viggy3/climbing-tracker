@@ -1,8 +1,9 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
-from pymongo import MongoClient
+from typing import Optional
+
 class TrackerModel(BaseModel):
-    id: str = Field(...)
+    id: Optional[str] = Field(None, description="Unique identifier (will be auto-generated)")
     name: str = Field(...)
     description: str = Field(...)
     date: datetime = Field(default_factory=datetime.utcnow)

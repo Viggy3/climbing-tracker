@@ -23,5 +23,5 @@ async def favicon():
     from fastapi.responses import Response
     return Response(status_code=204)  # No Content - tells browser no favicon available
 
-# Include router
-app.include_router(router)
+# Include router with API prefix to avoid route conflicts
+app.include_router(router, prefix="/api")
