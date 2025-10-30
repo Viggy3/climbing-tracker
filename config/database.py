@@ -19,18 +19,11 @@ uri = MONGODB_URL
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 
-# Create MongoDB client with timeout settings
-# client = MongoClient(
-#     MONGODB_URL,
-#     serverSelectionTimeoutMS=5000,  # 5 second timeout
-#     connectTimeoutMS=10000,  # 10 second connection timeout
-#     server_api = ServerApi('1'),
-#     tls=True
-# )
 
-# Get database and collection
+# Get database and collections
 db = client[DATABASE_NAME]
-collection = db[COLLECTION_NAME]  # Fixed: renamed from collection_name to collection
+trackers_collection = db[COLLECTION_NAME]  # Fixed: renamed from collection_name to collection
+users_collection = db["users"]  # Collection for user authentication data
 
 
 def test_connection():
@@ -51,6 +44,21 @@ def test_connection():
     except Exception as e:
         print(f"✗ An error occurred: {e}")
         return False
+
+def check_user_exists(user_info):
+    """Check if a user already exists in the database based on Google sub or email"""
+    google_sub = user_info.get("sub")
+    email = user_info.get("email")
+    existing_user = users_collection.find_one({"$or": [{"google_sub": google_sub}, {"email": email}]})
+    return existing_user
+
+def update_user_login(user_id):
+    """Update the last_login timestamp for an existing user"""
+    from datetime import datetime
+    users_collection.update_one(
+        {"_id": user_id},
+        {"$set": {"last_login": datetime.now()}}
+    )   
 
 
 # Optional: Test connection when module is imported

@@ -1,11 +1,77 @@
+import token
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from starlette.config import Config
+from authlib.integrations.starlette_client import OAuth
+from starlette.responses import RedirectResponse
+from starlette.middleware.sessions import SessionMiddleware
+from pathlib import Path
+from config.database import users_collection, update_user_login, check_user_exists
+
 #adding template pointer
 templates = Jinja2Templates(directory="templates")
 
 auth = APIRouter(tags=["auth"])
 
+# Get the project root directory (parent of router folder)
+PROJECT_ROOT = Path(__file__).parent.parent
+config = Config(PROJECT_ROOT / ".env")
+
+oauth = OAuth(config)
+oauth.register(
+    name='google',
+    client_id=config('GOOGLE_CLIENT_ID'),
+    client_secret=config('GOOGLE_CLIENT_SECRET'),
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={
+        'scope': 'openid email profile'
+    },
+    redirect_uri='http://localhost:8000/auth/google/callback'
+
+)
+
 @auth.get("/login")
 async def login_redirect(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    google_login = "/auth/google/login"
+    # apple_login = "/auth/apple/login"
+    return templates.TemplateResponse("login.html", {"request": request, "google_login": google_login})
+
+@auth.get("/google/login")
+async def google_login(request: Request):
+    redirect_uri = 'http://localhost:8000/auth/google/callback'
+    return await oauth.google.authorize_redirect(request, redirect_uri,  prompt='consent')
+
+@auth.get("/google/callback")
+async def google_callback(request: Request):
+    try:
+        token = await oauth.google.authorize_access_token(request)
+        # Here you can handle the user information (e.g., create a session, store in DB, etc.)
+        print(f"User info: {token['userinfo']}")
+        print(f"Token info: {token}")
+        print(f"Token keys: {token.keys()}")
+        user_info = token['userinfo']
+        # check if the user already exists
+        existing_user = check_user_exists(user_info)
+        if existing_user:
+            print("User already exists. Logging in...")
+            # Update last_login timestamp or any other info if needed
+            update_user_login(existing_user['_id'])
+        else:
+            print("New user. Creating user in database...")
+            from datetime import datetime
+            new_user = {
+                "google_sub": user_info.get("sub"),
+                "email": user_info.get("email"),
+                "name": user_info.get("name"),
+                "profile_pic": user_info.get("picture"),
+                "created_at": datetime.now(),
+                "last_login": datetime.now()
+            }
+            users_collection.insert_one(new_user)
+        return RedirectResponse(url="/me")    
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return RedirectResponse(url="/login")
+# @auth.get("/google/login")
+# async def google_login():

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from models.trackers import TrackerModel
 from fastapi.responses import RedirectResponse
-from config.database import collection
+from config.database import trackers_collection as collection
 from schema.schemas import individual_serial, list_serial
 from bson import ObjectId
 
@@ -21,7 +21,3 @@ async def add_tracker(tracker: TrackerModel):
     result = collection.insert_one(tracker_dict)
     new_tracker = collection.find_one({"_id": result.inserted_id})
     return individual_serial(new_tracker)
-
-@router.get("/login")
-async def login_redirect():
-    return RedirectResponse("/template/login")
