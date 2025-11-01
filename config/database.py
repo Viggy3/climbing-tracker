@@ -3,6 +3,8 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 from dotenv import load_dotenv
+from pymongo.database import Database
+from typing import Generator
 
 # Load environment variables from .env file
 load_dotenv()
@@ -24,6 +26,7 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client[DATABASE_NAME]
 trackers_collection = db[COLLECTION_NAME]  # Fixed: renamed from collection_name to collection
 users_collection = db["users"]  # Collection for user authentication data
+
 
 
 def test_connection():

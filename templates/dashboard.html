@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - 🧗 Climbing Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body class="body">
+    <div>
+        <div class="dashboard-container">
+            <div class="dashboard-heading"></div>
+                <h1>Dashboard</h1>
+                <p>Welcome to your climbing dashboard! Here you can track your climbs and view your progress over time.</p>
+            </div>
+            <div class="stats-overview">
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <h3>
+                            {{ total_climbs }} 
+                        </h3>
+                        <p>Total Climbs</p>           
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>
+                            {{ highest_grade }}
+                        </h3>
+                        <p>Highest Grade</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class= "tracker-section">
+                
+                    <div class="tracker-content">
+                        {% if tracker %}
+                        <div class="tracker-list">
+                            {% for climb in tracker %}
+                            <div class="tracker-item">
+                                <h4>{{ climb.route_name }} - {{ climb.grade }}</h4>
+                                <p>Date: {{ climb.date }}</p>
+                                <p>Location: {{ climb.location }}</p>
+                                <p>Notes: {{ climb.notes }}</p>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                        {% else %}
+                        <div class="no-tracker">
+                            <p>No climbs tracked yet.</p>
+                            <p>It looks like you haven't started tracking any climbs yet!</p>
+                            <a href="/api/" class="btn btn-primary">Create Your First Climb</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="tracker-pagination">
+                        <button class="btn btn-primary">Previous</button>
+                        <span class="page-info">Page 1 of 5</span>
+                        <button class="btn btn-primary">Next</button>
+                    </div>
+
+            </div>
+        </div>
+    </div>

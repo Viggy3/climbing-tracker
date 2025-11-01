@@ -58,7 +58,7 @@ async def lifespan(app: FastAPI ):
 
 from router.route import router
 from router.auth import auth
-
+from router.user_routes import user_router
 # index route
 @app.get("/", response_class=HTMLResponse)
 async def read_index(request: Request):
@@ -82,6 +82,7 @@ app.include_router(router, prefix="/api")
 #Include router with login prefix
 app.include_router(auth, prefix="/auth")
 
+app.include_router(user_router, prefix="/user")
 # Include CORS middleware
 
 # Run the app with: uvicorn main:app --reload

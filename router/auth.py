@@ -57,6 +57,7 @@ async def google_callback(request: Request):
             print("User already exists. Logging in...")
             # Update last_login timestamp or any other info if needed
             update_user_login(existing_user['_id'])
+            new_user_id = str(existing_user["_id"])
         else:
             print("New user. Creating user in database...")
             from datetime import datetime
@@ -68,8 +69,15 @@ async def google_callback(request: Request):
                 "created_at": datetime.now(),
                 "last_login": datetime.now()
             }
-            users_collection.insert_one(new_user)
-        return RedirectResponse(url="/me")    
+            result = users_collection.insert_one(new_user)
+            new_user_id = str(result.inserted_id)  # Fixed: get ID from insert result
+            print(f"New user created with ID: {new_user_id}")
+
+        # Store user info in session (more secure than URL)
+        request.session['user_id'] = new_user_id
+        request.session['user_email'] = user_info.get("email")
+        request.session['user_name'] = user_info.get("name")
+        return RedirectResponse(url="/user/my_tracker")
     except Exception as e:
         print(f"Error occurred: {e}")
         return RedirectResponse(url="/login")
