@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - 🧗 Climbing Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+    <div class="body">
+        <div class="new-tracker-container">
+            <div class="new-tracker-heading">
+                <h1>Create a New Climb Tracker</h1>
+                <p>Fill in the details below to add a new climb to your tracker.</p>
+                {% if error %}
+                <div class="error-message">
+                    <p>❌ {{ error }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="new-tracker-form">
+                <form action="/api/create_tracker" method="post">
+                    <label for="climb_name">Climb Name:</label>
+                    <input type="text" id="climb_name" name="climb_name" required>
+                    <br>
+                    <label for="grade">Grade:</label>
+                    <label for="grading_system">Grading System:</label>
+                    <select id="grading_system" name="grading_system" required>
+                    <option value="v_grade">V Grade</option>
+                    <option value="font_grade">Font Grade</option>
+                    </select>
+                    <br>
+
+                    <label for="grade">Grade:</label>
+                    <select id="grade" name="grade" required>
+                    <!-- V grades (values uppercase) -->
+                    <optgroup label="V Grade" class="v-grade-options">
+                        <option class="v-option" value="VB">VB</option>
+                        <option class="v-option" value="V0">V0</option>
+                        <option class="v-option" value="V1">V1</option>
+                        <option class="v-option" value="V2">V2</option>
+                        <option class="v-option" value="V3">V3</option>
+                        <option class="v-option" value="V4">V4</option>
+                        <option class="v-option" value="V5">V5</option>
+                        <option class="v-option" value="V6">V6</option>
+                        <option class="v-option" value="V7">V7</option>
+                        <option class="v-option" value="V8">V8</option>
+                        <option class="v-option" value="V9">V9</option>
+                        <option class="v-option" value="V10">V10</option>
+                        <option class="v-option" value="V11">V11</option>
+                        <option class="v-option" value="V12">V12</option>
+                        <option class="v-option" value="V13">V13</option>
+                        <option class="v-option" value="V14">V14</option>
+                        <option class="v-option" value="V15">V15</option>
+                        <option class="v-option" value="V16">V16</option>
+                        <option class="v-option" value="V17">V17</option>
+                    </optgroup>
+
+                    <!-- Font grades (values lowercase) -->
+                    <optgroup label="Font Grade" class="font-grade-options">
+                        <option class="font-option" value="3">3</option>
+                        <option class="font-option" value="3+">3+</option>
+                        <option class="font-option" value="4">4</option>
+                        <option class="font-option" value="4+">4+</option>
+                        <option class="font-option" value="5">5</option>
+                        <option class="font-option" value="5+">5+</option>
+                        <option class="font-option" value="6a">6a</option>
+                        <option class="font-option" value="6a+">6a+</option>
+                        <option class="font-option" value="6b">6b</option>
+                        <option class="font-option" value="6b+">6b+</option>
+                        <option class="font-option" value="6c">6c</option>
+                        <option class="font-option" value="6c+">6c+</option>
+                        <option class="font-option" value="7a">7a</option>
+                        <option class="font-option" value="7a+">7a+</option>
+                        <option class="font-option" value="7b">7b</option>
+                        <option class="font-option" value="7b+">7b+</option>
+                        <option class="font-option" value="7c">7c</option>
+                        <option class="font-option" value="7c+">7c+</option>
+                        <option class="font-option" value="8a">8a</option>
+                        <option class="font-option" value="8a+">8a+</option>
+                        <option class="font-option" value="8b">8b</option>
+                        <option class="font-option" value="8b+">8b+</option>
+                        <option class="font-option" value="8c">8c</option>
+                        <option class="font-option" value="8c+">8c+</option>
+                        <option class="font-option" value="9a">9a</option>
+                    </optgroup>
+                    </select>
+
+                    <script>
+                    (function () {
+                        const gradingSystem = document.getElementById('grading_system');
+                        const gradeSelect = document.getElementById('grade');
+                        const vOptions = Array.from(document.querySelectorAll('.v-option'));
+                        const fontOptions = Array.from(document.querySelectorAll('.font-option'));
+
+                        function setSystem(system) {
+                        if (system === 'v_grade') {
+                            // show/enable V, hide/disable Font
+                            vOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
+                            fontOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
+
+                            // pick first enabled v option if current selection was font or invalid
+                            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V') === false) {
+                            const first = vOptions.find(o => !o.disabled);
+                            if (first) gradeSelect.value = first.value;
+                            }
+                        } else {
+                            // show/enable Font, hide/disable V
+                            fontOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
+                            vOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
+
+                            // pick first enabled font option if current selection was v or invalid
+                            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V')) {
+                            const first = fontOptions.find(o => !o.disabled);
+                            if (first) gradeSelect.value = first.value;
+                            }
+                        }
+                        // ensure required still works
+                        gradeSelect.required = true;
+                        }
+
+                        // initial setup on load
+                        setSystem(gradingSystem.value);
+
+                        // listen for changes
+                        gradingSystem.addEventListener('change', (e) => {
+                        setSystem(e.target.value);
+                        });
+                    })();
+                    </script>
+                    <br>
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                    <br>
+                    <label for="description">Additional Notes (Optional):</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Any additional details about this climb..."></textarea>
+                    <br>
+                    <label for="attempts"></label>Number of Attempts:</label>
+                    <input type="number" id="attempts" name="attempts" min="1" value="1" required>
+                    <button type="submit" class="btn btn-primary">🧗 Add Climb</button>
+                    <a href="/user/my_tracker" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .new-tracker-form textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+    </style>
+</body>

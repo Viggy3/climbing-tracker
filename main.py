@@ -59,6 +59,7 @@ async def lifespan(app: FastAPI ):
 from router.route import router
 from router.auth import auth
 from router.user_routes import user_router
+from router.api_route import api_router
 # index route
 @app.get("/", response_class=HTMLResponse)
 async def read_index(request: Request):
@@ -77,7 +78,7 @@ async def login_redirect():
     return RedirectResponse(url="/auth/login", status_code=302)
 
 # Include router with API prefix to avoid route conflicts
-app.include_router(router, prefix="/api")
+app.include_router(api_router, prefix="/api")
 
 #Include router with login prefix
 app.include_router(auth, prefix="/auth")
