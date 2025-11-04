@@ -33,20 +33,20 @@ async def create_tracker(request: Request):
         
         # Create tracker data from form
         user_description = form_data.get("description", "").strip()
-        base_description = f"Grade: {form_data.get('grade')} ({form_data.get('grading_system')})"
         
         # Combine grade info with user notes
-        full_description = base_description
         if user_description:
-            full_description += f" - {user_description}"
+            full_description = user_description
+        else:
+            full_description = "No additional notes."
             
         tracker_data = {
             "name": form_data.get("climb_name"),
             "description": full_description,
             "date": form_data.get("date"),
-            "attempts": 1,  # Default to 1 attempt for new climb
+            "attempts": form_data.get("attempts", 1),  # Default to 1 attempt for new climb
             "grade": form_data.get("grade"),
-            "complete": False,  # Default to incomplete
+            "complete": form_data.get("complete", False),  # Default to incomplete
             "user_id": user_id  # Link to authenticated user
         }
         
@@ -62,14 +62,11 @@ async def create_tracker(request: Request):
         
         # Insert into database
         result = trackers_collection.insert_one(tracker_data)
-        
-        print(f"✅ Created new tracker: {tracker_data['name']} for user {user_id}")
-        
         # Redirect to user dashboard
         return RedirectResponse(url="/user/my_tracker", status_code=302)
         
     except Exception as e:
-        print(f"❌ Error creating tracker: {e}")
+        print(f" Error creating tracker: {e}")
         # Return to form with error
         return templates.TemplateResponse(
             "new_tracker.html", 

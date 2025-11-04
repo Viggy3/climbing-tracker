@@ -14,16 +14,11 @@
             <div class="new-tracker-heading">
                 <h1>Create a New Climb Tracker</h1>
                 <p>Fill in the details below to add a new climb to your tracker.</p>
-                {% if error %}
-                <div class="error-message">
-                    <p>❌ {{ error }}</p>
-                </div>
-                {% endif %}
             </div>
             <div class="new-tracker-form">
-                <form action="/api/create_tracker" method="post">
+                <form action="/api/create_tracker" method="post" autocomplete="off">
                     <label for="climb_name">Climb Name:</label>
-                    <input type="text" id="climb_name" name="climb_name" required>
+                    <input type="text" id="climb_name" name="climb_name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
                     <br>
                     <label for="grade">Grade:</label>
                     <label for="grading_system">Grading System:</label>
@@ -139,59 +134,14 @@
                     <br>
                     <label for="attempts"></label>Number of Attempts:</label>
                     <input type="number" id="attempts" name="attempts" min="1" value="1" required>
+                    <br>
+                    <label for="complete">Completed:</label>
+                    <input type="checkbox" id="complete" name="complete">
+                    <br>
                     <button type="submit" class="btn btn-primary">🧗 Add Climb</button>
                     <a href="/user/my_tracker" class="btn btn-secondary">Cancel</a>
                 </form>
             </div>
         </div>
     </div>
-
-    <style>
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            border-radius: 4px;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        
-        .new-tracker-form textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            font-family: inherit;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 5px;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #0056b3;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #545b62;
-        }
-    </style>
 </body>

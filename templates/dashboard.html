@@ -39,34 +39,42 @@
             <div class= "tracker-section">
                 
                     <div class="tracker-content">
-                        {% if tracker %}
+                        {% if all_trackers %}
                         <div class="tracker-list">
-                            {# create pagination of all tracker climbs where all tracked climbs are all_trackers #}
-                            {% for climb in tracker %}
+                            {# Loop through all tracked climbs #}
+                            {% for climb in all_trackers %}
                             <div class="tracker-item">
-                                <h3>{{ climb.climb_name }}</h3>
-                                <p>Grade: {{ climb.grade }} ({{ climb.grading_system }})</p>
-                                <p>Date Added: {{ climb.date_added }}</p>
-                                <p>Attempts: {{ climb.attempts }}</p>
-                                {% if climb.description %}
-                                <p>Description: {{ climb.description }}</p>
-                                {% endif %}
+                                <div class="climb-header">
+                                    <h3>{{ climb.name }}</h3>
+                                    <span class="grade-badge">{{ climb.grade }}</span>
+                                </div>
+                                <p class="climb-description">{{ climb.description }}</p>
+                                <div class="climb-meta">
+                                    <span class="climb-date"> {{ climb.date }}</span>
+                                    <span class="climb-attempts"> {{ climb.attempts }} attempts</span>
+                                    <span class="climb-status">
+                                        {% if climb.complete %}
+                                            <span class="status-complete">Complete</span>
+                                        {% else %}
+                                            <span class="status-in-progress">In Progress</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </div>
                             {% endfor %}
+                            <a href="/api/new_tracker" class="btn btn-primary">Add Climb</a>
+
                         </div>
                         {% else %}
                         <div class="no-tracker">
+                            <h3>🧗‍♀️ Ready to Start Climbing?</h3>
                             <p>No climbs tracked yet.</p>
                             <p>It looks like you haven't started tracking any climbs yet!</p>
                             <a href="/api/new_tracker" class="btn btn-primary">Create Your First Climb</a>
                         </div>
                         {% endif %}
                     </div>
-                    <div class="tracker-pagination">
-                        <button class="btn btn-primary">Previous</button>
-                        <span class="page-info">Page 1 of 5</span>
-                        <button class="btn btn-primary">Next</button>
-                    </div>
+                    
 
             </div>
         </div>
