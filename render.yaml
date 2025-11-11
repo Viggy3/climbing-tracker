@@ -1,0 +1,20 @@
+# Render.com configuration
+# This file tells Render how to build and run your app
+
+# Build Command (optional - Render can auto-detect)
+buildCommand: pip install -r requirements.txt
+
+# Start Command
+startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+
+# Environment
+env: python
+
+# Python Version
+pythonVersion: 3.11.0
+
+# Auto-Deploy
+autoDeploy: true
+
+# Health Check Path
+healthCheckPath: /
