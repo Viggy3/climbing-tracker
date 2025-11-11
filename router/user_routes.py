@@ -5,7 +5,7 @@ from config.database import trackers_collection as collection
 from schema.schemas import individual_serial, list_serial
 from bson import ObjectId
 from fastapi.templating import Jinja2Templates
-from schema.grade_utils import highest_grade
+from schema.grade_utils import highest_grade as calculate_highest_grade
 
 templates = Jinja2Templates(directory="templates")
 
@@ -13,7 +13,7 @@ templates = Jinja2Templates(directory="templates")
 user_router = APIRouter()
 
 @user_router.get("/my_tracker")
-async def get_my_tracker(request: Request, user_id: str = None, page_number: int = 1, per_page: int = 5):
+async def get_my_tracker(request: Request, user_id: str = None, page: int = 1, per_page: int = 5):
     # Try to get user_id from session first, then from query parameter
     session_user_id = request.session.get('user_id')
     final_user_id = session_user_id or user_id
@@ -28,8 +28,8 @@ async def get_my_tracker(request: Request, user_id: str = None, page_number: int
     tracker = collection.find_one({"user_id": final_user_id})
 
     total_trackers_count = collection.count_documents({"user_id": final_user_id})
-    total_pages = max(1, (total_trackers_count // per_page + 1))    
-    page = max(1, min(page_number, total_pages))
+    total_pages = max(1, (total_trackers_count + per_page - 1) // per_page)
+    page = max(1, min(page, total_pages))
     skip = (page - 1) * per_page
 
     # Get paginated trackers for this user
@@ -42,27 +42,31 @@ async def get_my_tracker(request: Request, user_id: str = None, page_number: int
         .limit(per_page)
         )
     latest_tracker = paginated_trackers[0] if paginated_trackers else None
-
+    print(per_page)
     # Get all trackers for this user (for stats)
     all_trackers = list(collection.find({"user_id": final_user_id}))
 
     highest_grade = "N/A"
     if all_trackers:
         grades = [t.get("grade", 0) for t in all_trackers if "grade" in t]
-        highest_grade = max(grades) if grades else "N/A"
+        highest_grade = calculate_highest_grade(grades)
     
     # Prepare template context
     context = {
         "request": request,
-        "tracker": individual_serial(tracker) if tracker else None,
-        "all_trackers": [individual_serial(t) for t in all_trackers] if all_trackers else [],
+        "tracker": latest_tracker,
+        "all_trackers": all_trackers,
         "user_id": final_user_id,
-        "total_climbs": len(all_trackers),
+        "total_climbs": total_trackers_count,
         "completed_climbs": len([t for t in all_trackers if t.get("complete", False)]),
         "user_email": request.session.get('user_email', 'Not available'),
-        "highest_grade": max([t.get("grade", 0) for t in all_trackers], default=0) if all_trackers else 0
+        "highest_grade": highest_grade,
+        "current_page": page,
+        "paginated_trackers": [individual_serial(t) for t in paginated_trackers],
+        "pages_total": total_pages,
+        "per_page": per_page
     }
-    
+    print(per_page)
     print(f"✅ Found {len(all_trackers)} total trackers for user")
     return templates.TemplateResponse("dashboard.html", context)
     

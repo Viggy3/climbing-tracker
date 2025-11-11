@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - 🧗 Climbing Tracker</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+{% extends "base.html" %}
+{% block title %}New Climb Tracker -  Climbing Tracker{% endblock %}
+{% block extra_css %}
     <link rel="stylesheet" href="/static/css/dashboard.css">
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-</head>
-<body>
+    <link rel="stylesheet" href="/static/css/new_tracker.css">
+{% endblock %}
+
+{% block content %}
+
     <div class="body">
         <div class="new-tracker-container">
             <div class="new-tracker-heading">
@@ -17,19 +15,22 @@
             </div>
             <div class="new-tracker-form">
                 <form action="/api/create_tracker" method="post" autocomplete="off">
-                    <label for="climb_name">Climb Name:</label>
-                    <input type="text" id="climb_name" name="climb_name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
-                    <br>
-                    <label for="grade">Grade:</label>
-                    <label for="grading_system">Grading System:</label>
-                    <select id="grading_system" name="grading_system" required>
-                    <option value="v_grade">V Grade</option>
-                    <option value="font_grade">Font Grade</option>
-                    </select>
-                    <br>
+                    <div class="form-group">
+                        <label for="climb_name">Climb Name:</label>
+                        <input type="text" id="climb_name" name="climb_name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="grading_system">Grading System:</label>
+                        <select id="grading_system" name="grading_system" required>
+                            <option value="v_grade">V Grade</option>
+                            <option value="font_grade">Font Grade</option>
+                        </select>
+                    </div>
 
-                    <label for="grade">Grade:</label>
-                    <select id="grade" name="grade" required>
+                    <div class="form-group">
+                        <label for="grade">Grade:</label>
+                        <select id="grade" name="grade" required>
                     <!-- V grades (values uppercase) -->
                     <optgroup label="V Grade" class="v-grade-options">
                         <option class="v-option" value="VB">VB</option>
@@ -82,66 +83,80 @@
                         <option class="font-option" value="9a">9a</option>
                     </optgroup>
                     </select>
+                    </div>
 
-                    <script>
-                    (function () {
-                        const gradingSystem = document.getElementById('grading_system');
-                        const gradeSelect = document.getElementById('grade');
-                        const vOptions = Array.from(document.querySelectorAll('.v-option'));
-                        const fontOptions = Array.from(document.querySelectorAll('.font-option'));
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Additional Notes (Optional):</label>
+                        <textarea id="description" name="description" rows="3" placeholder="Any additional details about this climb..."></textarea>
+                    </div>
 
-                        function setSystem(system) {
-                        if (system === 'v_grade') {
-                            // show/enable V, hide/disable Font
-                            vOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
-                            fontOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
+                    <!-- Two-column row for attempts and completed -->
+                    <div class="form-row-two-col">
+                        <div class="form-group-inline">
+                            <label for="attempts">Number of Attempts:</label>
+                            <input type="number" id="attempts" name="attempts" min="1" value="1" required>
+                        </div>
+                        <div class="form-group-inline">
+                            <label for="complete">Completed:</label>
+                            <input type="checkbox" id="complete" name="complete">
+                        </div>
+                    </div>
 
-                            // pick first enabled v option if current selection was font or invalid
-                            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V') === false) {
-                            const first = vOptions.find(o => !o.disabled);
-                            if (first) gradeSelect.value = first.value;
-                            }
-                        } else {
-                            // show/enable Font, hide/disable V
-                            fontOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
-                            vOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
-
-                            // pick first enabled font option if current selection was v or invalid
-                            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V')) {
-                            const first = fontOptions.find(o => !o.disabled);
-                            if (first) gradeSelect.value = first.value;
-                            }
-                        }
-                        // ensure required still works
-                        gradeSelect.required = true;
-                        }
-
-                        // initial setup on load
-                        setSystem(gradingSystem.value);
-
-                        // listen for changes
-                        gradingSystem.addEventListener('change', (e) => {
-                        setSystem(e.target.value);
-                        });
-                    })();
-                    </script>
-                    <br>
-                    <label for="date">Date:</label>
-                    <input type="date" id="date" name="date" required>
-                    <br>
-                    <label for="description">Additional Notes (Optional):</label>
-                    <textarea id="description" name="description" rows="3" placeholder="Any additional details about this climb..."></textarea>
-                    <br>
-                    <label for="attempts"></label>Number of Attempts:</label>
-                    <input type="number" id="attempts" name="attempts" min="1" value="1" required>
-                    <br>
-                    <label for="complete">Completed:</label>
-                    <input type="checkbox" id="complete" name="complete">
-                    <br>
-                    <button type="submit" class="btn btn-primary">🧗 Add Climb</button>
-                    <a href="/user/my_tracker" class="btn btn-secondary">Cancel</a>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Add Climb</button>
+                        <a href="/user/my_tracker" class="btn btn-secondary">Cancel</a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-</body>
+{% block scripts %}
+    <script>
+    (function () {
+        const gradingSystem = document.getElementById('grading_system');
+        const gradeSelect = document.getElementById('grade');
+        const vOptions = Array.from(document.querySelectorAll('.v-option'));
+        const fontOptions = Array.from(document.querySelectorAll('.font-option'));
+
+        function setSystem(system) {
+        if (system === 'v_grade') {
+            // show/enable V, hide/disable Font
+            vOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
+            fontOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
+
+            // pick first enabled v option if current selection was font or invalid
+            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V') === false) {
+            const first = vOptions.find(o => !o.disabled);
+            if (first) gradeSelect.value = first.value;
+            }
+        } else {
+            // show/enable Font, hide/disable V
+            fontOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
+            vOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
+
+            // pick first enabled font option if current selection was v or invalid
+            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V')) {
+            const first = fontOptions.find(o => !o.disabled);
+            if (first) gradeSelect.value = first.value;
+            }
+        }
+        // ensure required still works
+        gradeSelect.required = true;
+        }
+
+        // initial setup on load
+        setSystem(gradingSystem.value);
+
+        // listen for changes
+        gradingSystem.addEventListener('change', (e) => {
+        setSystem(e.target.value);
+        });
+    })();
+    </script>
+    {% endblock%}
+    {% endblock %}

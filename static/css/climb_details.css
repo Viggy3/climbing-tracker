@@ -1,0 +1,383 @@
+/* Color Scheme Variables */
+:root {
+    --primary-bg: #021526;      /* Dark background */
+    --secondary-bg: #03346E;    /* Medium background */
+    --tertiary-bg: #6EACDA;     /* Light blue highlights */
+    --text-color: #E2E2B6;      /* Light text/borders */
+}
+
+/* Main Container */
+.climb_edit_form {
+    padding: 2%;
+    max-width: 800px;
+    margin: 2rem auto;
+    border: 2px solid var(--text-color);
+    border-radius: 12px;
+    background-color: var(--secondary-bg);
+    box-shadow: 0 4px 6px rgba(2, 21, 38, 0.3);
+}
+
+/* Header Section */
+.climb-edit-heading {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.climb-edit-heading h1 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.climb-edit-heading p {
+    color: rgba(226, 226, 182, 0.8);
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Form Container */
+.climb-edit-container {
+    padding: 1.5rem;
+    background-color: rgba(2, 21, 38, 0.3);
+    border-radius: 8px;
+    border: 1px solid var(--tertiary-bg);
+}
+
+/* Two-column row for attempts and completed */
+.form-row-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Inline form groups (for the two-column row) */
+.form-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 48px; /* Ensure consistent height for alignment */
+}
+
+.form-group-inline label {
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.form-group-inline input {
+    flex: 1;
+}
+
+/* Special styling for checkbox group to keep label and checkbox together */
+.form-group-inline:has(input[type="checkbox"]) {
+    gap: 0.5rem;
+    align-items: baseline; /* Align to text baseline instead of center */
+}
+
+.form-group-inline:has(input[type="checkbox"]) label {
+    margin-right: 0.5rem;
+    line-height: 20px; /* Match checkbox height for perfect alignment */
+}
+
+.form-group-inline:has(input[type="checkbox"]) input[type="checkbox"] {
+    flex: none;
+    margin-top: 0; /* Reset margin since we're using baseline alignment */
+}
+
+/* Specific styling for attempts input */
+.form-group-inline input[type="number"] {
+    max-width: 100px;
+}
+
+/* Button container */
+.form-buttons {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Form Groups - Standard single column */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+/* Labels */
+label {
+    display: block;
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+    font-size: 18px;
+}
+
+label:first-of-type {
+    margin-top: 0;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-bg);
+    border: 2px solid var(--tertiary-bg);
+    border-radius: 6px;
+    color: var(--text-color);
+    font-size: 18px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    line-height: 1.2;
+}
+
+/* Focus States */
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--text-color);
+    background-color: var(--secondary-bg);
+    box-shadow: 0 0 0 3px rgba(110, 172, 218, 0.2);
+}
+
+/* Placeholder Styling */
+input::placeholder,
+textarea::placeholder {
+    color: rgba(226, 226, 182, 0.6);
+}
+
+/* Specific Input Styling */
+#edit_climb_attempts {
+    max-width: 120px;
+    font-size: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Select Dropdowns */
+select {
+    cursor: pointer;
+}
+
+select option {
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    padding: 8px;
+}
+
+select optgroup {
+    background-color: var(--secondary-bg);
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+/* Textarea */
+textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--tertiary-bg);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Checkbox Label Alignment */
+label[for="edit_climb_complete"] {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+/* Button Styling */
+.btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0.5rem 0.5rem 0 0;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background-color: var(--tertiary-bg);
+    color: var(--primary-bg);
+    border-color: var(--tertiary-bg);
+}
+
+.btn-primary:hover {
+    background-color: var(--text-color);
+    border-color: var(--text-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(110, 172, 218, 0.3);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: var(--text-color);
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+    border-color: #545b62;
+    transform: translateY(-1px);
+}
+
+/* Form Layout */
+form br {
+    display: none; /* Remove line breaks, use margins instead */
+}
+
+/* Button Container */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+/* Grade Selection Layout */
+.grade-selection {
+    margin-bottom: 1.5rem;
+}
+
+.grade-system-row {
+    margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .climb_edit_form {
+        margin: 1rem;
+        padding: 1.5rem 1rem;
+    }
+    
+    .climb-edit-container {
+        padding: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .form-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    /* Stack two-column layout on mobile */
+    .form-row-two-col {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* Mobile-specific input adjustments */
+    .form-group-inline {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .form-group-inline input[type="number"] {
+        max-width: 80px;
+        min-width: 50px;
+        flex: 0 0 auto;
+    }
+    
+    /* Keep checkbox next to label on mobile */
+    .form-group-inline:has(input[type="checkbox"]) {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .climb_edit_form {
+        margin: 0.5rem;
+        padding: 1rem 0.75rem;
+    }
+    
+    input, select, textarea {
+        font-size: 16px; /* Prevent zoom on mobile */
+    }
+    
+    .form-group-inline {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .form-group-inline label {
+        width: 100%;
+    }
+    
+    .form-group-inline input {
+        width: 100%;
+        max-width: 120px;
+    }
+    
+    /* Exception: Keep checkbox inline with label even on very small screens */
+    .form-group-inline:has(input[type="checkbox"]) {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group-inline:has(input[type="checkbox"]) label {
+        width: auto;
+    }
+}
+
+/* Loading States */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Success/Error States */
+.input-error {
+    border-color: #ff6b6b !important;
+}
+
+.input-success {
+    border-color: #51cf66 !important;
+}
+
+/* Hidden optgroups (for JavaScript functionality) */
+.v-grade-options[style*="display: none"],
+.font-grade-options[style*="display: none"] {
+    display: none !important;
+}

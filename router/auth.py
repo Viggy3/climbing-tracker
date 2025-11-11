@@ -33,9 +33,7 @@ oauth.register(
 
 @auth.get("/login")
 async def login_redirect(request: Request):
-    google_login = "/auth/google/login"
-    # apple_login = "/auth/apple/login"
-    return templates.TemplateResponse("login.html", {"request": request, "google_login": google_login})
+    return RedirectResponse(url="/auth/google/login")
 
 @auth.get("/google/login")
 async def google_login(request: Request):
@@ -81,5 +79,12 @@ async def google_callback(request: Request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return RedirectResponse(url="/login")
-# @auth.get("/google/login")
-# async def google_login():
+
+@auth.get("/logout")
+async def logout(request: Request):
+    try:
+        request.session.clear()
+        return RedirectResponse(url="/")
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return RedirectResponse(url="/")

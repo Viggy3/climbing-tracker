@@ -9,6 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from pathlib import Path
 from config.database import users_collection, update_user_login, check_user_exists
 import python_multipart
+from bson import ObjectId
 #adding template pointer
 templates = Jinja2Templates(directory="templates")
 
@@ -72,3 +73,53 @@ async def create_tracker(request: Request):
             "new_tracker.html", 
             {"request": request, "error": "Failed to create tracker. Please try again."}
         )
+
+# Additional API routes can be added here
+@api_router.get("/edit_tracker/{tracker_id}")
+async def edit_tracker(tracker_id: str, request: Request):
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return RedirectResponse(url="/auth/login", status_code=302)
+        from config.database import trackers_collection
+        climb_data = trackers_collection.find_one({"_id": ObjectId(tracker_id), "user_id": user_id})
+        if not climb_data:
+            print(" Climb not found or access denied.") 
+            return RedirectResponse(url="/user/my_tracker", status_code=302)
+        context = {
+            "request": request,
+            "climb": climb_data
+        }
+        return templates.TemplateResponse("climb_details.html", context)
+    except Exception as e:
+        print(f" Error editing tracker: {e}")
+        return RedirectResponse(url="/user/my_tracker", status_code=302)
+    
+
+@api_router.post("/update_tracker/{tracker_id}")
+async def update_tracker(tracker_id: str, request: Request):
+    try:
+        form_data = await request.form()
+
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return RedirectResponse(url="/auth/login", status_code=302)
+        from config.database import trackers_collection
+        from datetime import datetime
+        update_data = {
+            "description": form_data.get("edit_climb_description", "").strip(),
+            "attempts": int(form_data.get("edit_climb_attempts", 1)),
+            "grade": form_data.get("edit_climb_grade"),
+            "complete": form_data.get("edit_climb_complete") == "on"
+        }
+        print(form_data.items())
+        trackers_collection.update_one(
+            {"_id": ObjectId(tracker_id), "user_id": user_id},
+            {"$set": update_data}
+        )
+
+        return RedirectResponse(url="/user/my_tracker", status_code=302)
+    except Exception as e:
+        print(f"error updating database climb {tracker_id}: {e}")
+        return RedirectResponse(url="/user/my_tracker", status_code=302)
+        # Convert date string to datetime if provided

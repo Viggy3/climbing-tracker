@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 from config.database import users_collection as users, trackers_collection as trackers
 from pymongo import MongoClient
 from contextlib import asynccontextmanager
-
+import fastapi_pagination
+from fastapi_pagination import add_pagination
 load_dotenv()
 
 #check for secret key in .env
@@ -23,6 +24,9 @@ app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY, session_cookie="session", same_site="lax")
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+#pagination initialisation
+add_pagination(app)
 
 # Set up Jinja2 templates
 templates = Jinja2Templates(directory="templates")

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Climbing Tracker{% endblock %}</title>
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="/static/css/base.css">
+        {% block extra_css %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    </head>
+    <body class="navbar-styled">
+        <nav class="navbar">
+            <div>
+                <a href="/"> Home </a>
+                </div>
+                <div class="nav-links">
+                    {% if request.session.get('user_id') %}
+                        <a href="/user/my_tracker">Dashboard</a>
+                        <a href="/auth/logout">Logout</a>
+                    {% else %}
+                        <a href="/auth/google/login">Login</a>
+                    {% endif %}
+                </div>
+
+            </nav>
+            <main>
+                {% block content %}{% endblock %}
+
+            </main>
+            {% block extra_scripts %}{% endblock %}
+        </body>
+</html>

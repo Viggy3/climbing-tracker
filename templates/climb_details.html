@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Climb - 🧗 Climbing Tracker{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/new_tracker.css">
+<link rel="stylesheet" href="/static/css/climb_details.css">
+{% endblock %}
+
+{% block content %}
+    <div>
+        <div class="climb_edit_form">
+            <div class="climb-edit-heading">
+                <h1>Edit Climb</h1>
+                <p>Update your climb details below.</p>
+            </div>
+            <div class="climb-edit-container">
+                <form action="/api/update_tracker/{{ climb._id }}" method="post">
+                    
+                    <div class="form-group">
+                        <label for="grading_system">Grading System:</label>
+                        <select id="grading_system" name="grading_system" required>
+                            <option value="v_grade" {% if climb.grade and climb.grade.startswith('V') %}selected{% endif %}>V Grade</option>
+                            <option value="font_grade" {% if climb.grade and not climb.grade.startswith('V') %}selected{% endif %}>Font Grade</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_climb_grade">Grade:</label>
+                        <select id="edit_climb_grade" name="edit_climb_grade">
+                    <!-- V grades (values uppercase) -->
+                    <optgroup label="V Grade" class="v-grade-options">
+                        <option class="v-option" value="VB" {% if climb.grade == 'VB' %}selected{% endif %}>VB</option>
+                        <option class="v-option" value="V0" {% if climb.grade == 'V0' %}selected{% endif %}>V0</option>
+                        <option class="v-option" value="V1" {% if climb.grade == 'V1' %}selected{% endif %}>V1</option>
+                        <option class="v-option" value="V2" {% if climb.grade == 'V2' %}selected{% endif %}>V2</option>
+                        <option class="v-option" value="V3" {% if climb.grade == 'V3' %}selected{% endif %}>V3</option>
+                        <option class="v-option" value="V4" {% if climb.grade == 'V4' %}selected{% endif %}>V4</option>
+                        <option class="v-option" value="V5" {% if climb.grade == 'V5' %}selected{% endif %}>V5</option>
+                        <option class="v-option" value="V6" {% if climb.grade == 'V6' %}selected{% endif %}>V6</option>
+                        <option class="v-option" value="V7" {% if climb.grade == 'V7' %}selected{% endif %}>V7</option>
+                        <option class="v-option" value="V8" {% if climb.grade == 'V8' %}selected{% endif %}>V8</option>
+                        <option class="v-option" value="V9" {% if climb.grade == 'V9' %}selected{% endif %}>V9</option>
+                        <option class="v-option" value="V10" {% if climb.grade == 'V10' %}selected{% endif %}>V10</option>
+                        <option class="v-option" value="V11" {% if climb.grade == 'V11' %}selected{% endif %}>V11</option>
+                        <option class="v-option" value="V12" {% if climb.grade == 'V12' %}selected{% endif %}>V12</option>
+                        <option class="v-option" value="V13" {% if climb.grade == 'V13' %}selected{% endif %}>V13</option>
+                        <option class="v-option" value="V14" {% if climb.grade == 'V14' %}selected{% endif %}>V14</option>
+                        <option class="v-option" value="V15" {% if climb.grade == 'V15' %}selected{% endif %}>V15</option>
+                        <option class="v-option" value="V16" {% if climb.grade == 'V16' %}selected{% endif %}>V16</option>
+                        <option class="v-option" value="V17" {% if climb.grade == 'V17' %}selected{% endif %}>V17</option>
+                    </optgroup>
+
+                    <!-- Font grades (values lowercase) -->
+                    <optgroup label="Font Grade" class="font-grade-options">
+                        <option class="font-option" value="3" {% if climb.grade == '3' %}selected{% endif %}>3</option>
+                        <option class="font-option" value="3+" {% if climb.grade == '3+' %}selected{% endif %}>3+</option>
+                        <option class="font-option" value="4" {% if climb.grade == '4' %}selected{% endif %}>4</option>
+                        <option class="font-option" value="4+" {% if climb.grade == '4+' %}selected{% endif %}>4+</option>
+                        <option class="font-option" value="5" {% if climb.grade == '5' %}selected{% endif %}>5</option>
+                        <option class="font-option" value="5+" {% if climb.grade == '5+' %}selected{% endif %}>5+</option>
+                        <option class="font-option" value="6a" {% if climb.grade == '6a' %}selected{% endif %}>6a</option>
+                        <option class="font-option" value="6a+" {% if climb.grade == '6a+' %}selected{% endif %}>6a+</option>
+                        <option class="font-option" value="6b" {% if climb.grade == '6b' %}selected{% endif %}>6b</option>
+                        <option class="font-option" value="6b+" {% if climb.grade == '6b+' %}selected{% endif %}>6b+</option>
+                        <option class="font-option" value="6c" {% if climb.grade == '6c' %}selected{% endif %}>6c</option>
+                        <option class="font-option" value="6c+" {% if climb.grade == '6c+' %}selected{% endif %}>6c+</option>
+                        <option class="font-option" value="7a" {% if climb.grade == '7a' %}selected{% endif %}>7a</option>
+                        <option class="font-option" value="7a+" {% if climb.grade == '7a+' %}selected{% endif %}>7a+</option>
+                        <option class="font-option" value="7b" {% if climb.grade == '7b' %}selected{% endif %}>7b</option>
+                        <option class="font-option" value="7b+" {% if climb.grade == '7b+' %}selected{% endif %}>7b+</option>
+                        <option class="font-option" value="7c" {% if climb.grade == '7c' %}selected{% endif %}>7c</option>
+                        <option class="font-option" value="7c+" {% if climb.grade == '7c+' %}selected{% endif %}>7c+</option>
+                        <option class="font-option" value="8a" {% if climb.grade == '8a' %}selected{% endif %}>8a</option>
+                        <option class="font-option" value="8a+" {% if climb.grade == '8a+' %}selected{% endif %}>8a+</option>
+                        <option class="font-option" value="8b" {% if climb.grade == '8b' %}selected{% endif %}>8b</option>
+                        <option class="font-option" value="8b+" {% if climb.grade == '8b+' %}selected{% endif %}>8b+</option>
+                        <option class="font-option" value="8c" {% if climb.grade == '8c' %}selected{% endif %}>8c</option>
+                        <option class="font-option" value="8c+" {% if climb.grade == '8c+' %}selected{% endif %}>8c+</option>
+                        <option class="font-option" value="9a" {% if climb.grade == '9a' %}selected{% endif %}>9a</option>
+                    </optgroup>
+                    </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_climb_description">Additional Notes:</label>
+                        <textarea id="edit_climb_description" name="edit_climb_description" rows="3" placeholder="Any additional details about this climb...">{{ climb.description }}</textarea>
+                    </div>
+
+                    <!-- Two-column row for attempts and completed -->
+                    <div class="form-row-two-col">
+                        <div class="form-group-inline">
+                            <label for="edit_climb_attempts">Number of Attempts:</label>
+                            <input type="number" id="edit_climb_attempts" name="edit_climb_attempts" min="1" value="{{ climb.attempts }}" required>
+                        </div>
+                        <div class="form-group-inline">
+                            <label for="edit_climb_complete">Completed:</label>
+                            <input type="checkbox" id="edit_climb_complete" name="edit_climb_complete" {% if climb.complete %}checked{% endif %}>
+                        </div>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="/user/my_tracker" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% block extra_js %}
+<script>
+(function () {
+    const gradingSystem = document.getElementById('grading_system');
+    const gradeSelect = document.getElementById('edit_climb_grade');
+    const vOptions = Array.from(document.querySelectorAll('.v-option'));
+    const fontOptions = Array.from(document.querySelectorAll('.font-option'));
+
+    function setSystem(system) {
+        if (system === 'v_grade') {
+            // show V grade options, hide Font grade options
+            document.querySelector('.v-grade-options').style.display = 'block';
+            document.querySelector('.font-grade-options').style.display = 'none';
+            
+            // pick first V option if current selection was font or invalid
+            if (!gradeSelect.value || !gradeSelect.value.toUpperCase().startsWith('V')) {
+                gradeSelect.value = 'VB';
+            }
+        } else {
+            // show Font grade options, hide V grade options
+            document.querySelector('.v-grade-options').style.display = 'none';
+            document.querySelector('.font-grade-options').style.display = 'block';
+            
+            // pick first Font option if current selection was V or invalid
+            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V')) {
+                gradeSelect.value = '3';
+            }
+        }
+        // ensure required still works
+        gradeSelect.required = true;
+    }
+
+    // initial setup on load
+    setSystem(gradingSystem.value);
+
+    // listen for changes
+    gradingSystem.addEventListener('change', (e) => {
+        setSystem(e.target.value);
+    });
+})();
+</script>
+{% endblock %}
+
+{% endblock %}

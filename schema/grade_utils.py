@@ -19,7 +19,7 @@ V_to_Font ={
     "V2":  "5+",
     "V3":  "6a",
     "V4":  "6b",
-    "V5":  "6v",
+    "V5":  "6c",
     "V6":  "7a",
     "V7":  "7a+",
     "V8":  "7b",
@@ -38,23 +38,12 @@ font_index = {grade: index for index, grade in enumerate(font_grade_order)}
 index_to_font = {index: grade for index, grade in enumerate(font_grade_order)}
 
 def convert_to_font(grade: Optional[str]) -> Optional[str]:
-    if not grade:
+    if grade is None:
         return None
-
-    g = str(grade).strip()
-    if not g:
-        return None
-
-    # font grades => lowercase for matching
-    if not g.upper().startswith("V"):
-        g = g.lower()
-        return g if g in font_index else None
-
-    # V grades
-    g = g.upper()
-    core = g.replace("+", "")
-    mapped = V_to_Font.get(core)
-    return mapped.lower() if mapped else None
+    if grade in font_grade_order:
+        return grade
+    if grade in V_to_Font:
+        return V_to_Font[grade]
 
     
 def grade_to_numeric(grade: str) -> int:
@@ -71,3 +60,10 @@ def highest_grade(grades: Iterable[str]) -> Optional[str]:
             max_index = index
             best_grade = grade
     return best_grade if max_index > 0 else None
+
+
+['V7', '6c+', '7a', '5+', '8a+']
+
+# Example usage:
+print(highest_grade(['V7', '6c+', '7a', '5+', '8a+']))  # Output: '8a+'
+print(highest_grade(['5', '4+', 'V2', '6a']))  # Output: '6a'
