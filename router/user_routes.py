@@ -48,7 +48,7 @@ async def get_my_tracker(request: Request, user_id: str = None, page: int = 1, p
 
     highest_grade = "N/A"
     if all_trackers:
-        grades = [t.get("grade", 0) for t in all_trackers if "grade" in t]
+        grades = [t.get("grade", 0) for t in all_trackers if "grade" in t and t.get("complete", False)]
         highest_grade = calculate_highest_grade(grades)
     
     # Prepare template context
