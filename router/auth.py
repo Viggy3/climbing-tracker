@@ -1,4 +1,5 @@
 import token
+import os
 from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -18,6 +19,9 @@ auth = APIRouter(tags=["auth"])
 PROJECT_ROOT = Path(__file__).parent.parent
 config = Config(PROJECT_ROOT / ".env")
 
+# Get BASE_URL from environment
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+
 oauth = OAuth(config)
 oauth.register(
     name='google',
@@ -27,8 +31,7 @@ oauth.register(
     client_kwargs={
         'scope': 'openid email profile'
     },
-    redirect_uri='http://localhost:8000/auth/google/callback'
-
+    redirect_uri=f'{BASE_URL}/auth/google/callback'
 )
 
 @auth.get("/login")
@@ -37,7 +40,7 @@ async def login_redirect(request: Request):
 
 @auth.get("/google/login")
 async def google_login(request: Request):
-    redirect_uri = 'http://localhost:8000/auth/google/callback'
+    redirect_uri = f'{BASE_URL}/auth/google/callback'
     return await oauth.google.authorize_redirect(request, redirect_uri,  prompt='consent')
 
 @auth.get("/google/callback")
