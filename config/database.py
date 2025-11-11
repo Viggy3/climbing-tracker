@@ -57,10 +57,10 @@ def check_user_exists(user_info):
 
 def update_user_login(user_id):
     """Update the last_login timestamp for an existing user"""
-    from datetime import datetime
+    from datetime import datetime, timezone
     users_collection.update_one(
         {"_id": user_id},
-        {"$set": {"last_login": datetime.now()}}
+        {"$set": {"last_login": datetime.now(timezone.utc)}}
     )   
 
 

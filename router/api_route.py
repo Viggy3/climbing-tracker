@@ -53,13 +53,13 @@ async def create_tracker(request: Request):
         
         # Import here to avoid circular imports
         from config.database import trackers_collection
-        from datetime import datetime
+        from datetime import datetime, timezone
         
         # Convert date string to datetime if provided
         if tracker_data["date"]:
             tracker_data["date"] = datetime.fromisoformat(tracker_data["date"])
         else:
-            tracker_data["date"] = datetime.utcnow()
+            tracker_data["date"] = datetime.now(timezone.utc)
         
         # Insert into database
         result = trackers_collection.insert_one(tracker_data)

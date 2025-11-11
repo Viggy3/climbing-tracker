@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -6,7 +6,7 @@ class TrackerModel(BaseModel):
     id: Optional[str] = Field(None, description="Unique identifier (will be auto-generated)")
     name: str = Field(...)
     description: str = Field(...)
-    date: datetime = Field(default_factory=datetime.utcnow)
+    date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     attempts: int = Field(...)
     grade: str = Field(...)
     complete: bool = Field(default=False)
@@ -22,5 +22,3 @@ class TrackerModel(BaseModel):
                 "complete": False
             }
         }
-
-    

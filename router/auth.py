@@ -61,14 +61,14 @@ async def google_callback(request: Request):
             new_user_id = str(existing_user["_id"])
         else:
             print("New user. Creating user in database...")
-            from datetime import datetime
+            from datetime import datetime, timezone, timezone
             new_user = {
                 "google_sub": user_info.get("sub"),
                 "email": user_info.get("email"),
                 "name": user_info.get("name"),
                 "profile_pic": user_info.get("picture"),
-                "created_at": datetime.now(),
-                "last_login": datetime.now()
+                "created_at": datetime.now(timezone.utc),
+                "last_login": datetime.now(timezone.utc)
             }
             result = users_collection.insert_one(new_user)
             new_user_id = str(result.inserted_id)  # Fixed: get ID from insert result

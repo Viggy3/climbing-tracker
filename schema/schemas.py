@@ -14,4 +14,4 @@ def list_serial(tracker_list) -> list:
 
 
 def format_date(date_obj) -> str:
-    return date_obj.strftime("%Y-%m-%d %H:%M:%S")
+    return date_obj.strftime("%Y-%m-%d")
