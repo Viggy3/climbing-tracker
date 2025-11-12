@@ -61,7 +61,7 @@ async def google_callback(request: Request):
             new_user_id = str(existing_user["_id"])
         else:
             print("New user. Creating user in database...")
-            from datetime import datetime, timezone, timezone
+            from datetime import datetime, timezone
             new_user = {
                 "google_sub": user_info.get("sub"),
                 "email": user_info.get("email"),

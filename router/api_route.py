@@ -122,4 +122,24 @@ async def update_tracker(tracker_id: str, request: Request):
     except Exception as e:
         print(f"error updating database climb {tracker_id}: {e}")
         return RedirectResponse(url="/user/my_tracker", status_code=302)
-        # Convert date string to datetime if provided
+
+
+@api_router.get("/view_climb/{tracker_id}")
+async def view_climb(tracker_id: str, request: Request):
+    try:
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return RedirectResponse(url="/auth/login", status_code=302)
+        from config.database import trackers_collection
+        climb_data = trackers_collection.find_one({"_id": ObjectId(tracker_id), "user_id": user_id})
+        if not climb_data:
+            print(" Climb not found or access denied.") 
+            return RedirectResponse(url="/user/my_tracker", status_code=302)
+        context = {
+            "request": request,
+            "climb": climb_data
+        }
+        return templates.TemplateResponse("view_climb.html", context)
+    except Exception as e:
+        print(f" Error viewing tracker: {e}")
+        return RedirectResponse(url="/user/my_tracker", status_code=302)

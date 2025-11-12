@@ -138,6 +138,33 @@
             font-weight: bold;
         }
         
+        /* Climb Footer */
+        .climb-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .climb-details {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            flex: 1;
+        }
+        
+        .view-details {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .view-details .btn {
+            text-align: center;
+            min-width: 120px;
+        }
+        
         /* No Tracker State */
         .no-tracker {
             text-align: center;
@@ -196,14 +223,48 @@
             }
             
             .climb-header {
-                flex-direction: column;
+                position: relative;
+                flex-direction: row;
                 align-items: flex-start;
-                gap: 10px;
+                justify-content: space-between;
+            }
+            
+            .climb-header h3 {
+                flex: 1;
+                margin-right: 10px;
+            }
+            
+            .climb-actions {
+                position: relative;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 8px;
+                min-width: fit-content;
+            }
+            
+            .grade-badge {
+                order: -1; /* This moves the grade badge above the edit button */
+                margin-bottom: 5px;
             }
             
             .climb-meta {
                 flex-direction: column;
                 gap: 5px;
+            }
+            
+            .climb-details {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            /* Make buttons consistent size on mobile */
+            .climb-actions .btn,
+            .view-details .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                min-width: 60px !important;
+                width: auto;
+                box-sizing: border-box;
             }
         }
 

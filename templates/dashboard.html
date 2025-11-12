@@ -50,16 +50,22 @@
                                     </div>
                                 </div>
                                 <p class="climb-description">{{ climb.description }}</p>
-                                <div class="climb-details">
-                                    <span class="climb-date"> {{ climb.date }}</span>
-                                    <span class="climb-attempts"> {{ climb.attempts }} attempts</span>
-                                    <span class="climb-status"> 
-                                        {% if climb.complete%}
-                                        <span class="status-complete"> Completed</span>
-                                        {% else %}
-                                        <span class="status-in-progress"> In Progress</span>
-                                        {% endif %}
-                                    </span>
+                                <div class="climb-footer">
+
+                                    <div class="climb-details">
+                                        <span class="climb-date"> {{ climb.date }}</span>
+                                        <span class="climb-attempts"> {{ climb.attempts }} attempts</span>
+                                        <span class="climb-status"> 
+                                            {% if climb.complete%}
+                                            <span class="status-complete"> Completed</span>
+                                            {% else %}
+                                            <span class="status-in-progress"> In Progress</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="view-details">
+                                        <a href="/api/view_climb/{{ climb.id }}" class="btn btn-primary">View</a>
+                                    </div>
                                 </div>
                             </div>
                                 {%endfor%}

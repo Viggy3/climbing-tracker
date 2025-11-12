@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title%}View Climb {{ climb.name }}{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/view_climb.css">
+{% endblock %}
+
+{% block content %}
+
+    <div class="body">
+        <div class="view-climb-container">
+            <div class="view-climb-heading">
+                <h1>Climb Details: {{ climb.name }}</h1>
+            </div>
+            <div class="view-climb-details">
+                <div class="detail-grid">
+                    <div class="detail-box">
+                        <span class="detail-label">Name</span>
+                        <span class="detail-value">{{ climb.name }}</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Description</span>
+                        <span class="detail-value">{{ climb.description if climb.description else "N/A" }}</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Date</span>
+                        <span class="detail-value">{{ climb.date.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Attempts</span>
+                        <span class="detail-value">{{ climb.attempts }}</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Grade</span>
+                        <span class="detail-value">{{ climb.grade }}</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label">Completed</span>
+                        <span class="detail-value">{{ "Yes" if climb.complete else "No" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="view-climb-actions">
+                <a href="/user/my_tracker" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

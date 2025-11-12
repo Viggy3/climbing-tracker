@@ -1,0 +1,137 @@
+/* Color Scheme Variables */
+:root {
+    --primary-bg: #021526;      /* Dark background */
+    --secondary-bg: #03346E;    /* Medium background */
+    --tertiary-bg: #6EACDA;     /* Light blue highlights */
+    --text-color: #E2E2B6;      /* Light text/borders */
+}
+
+/* Main Container */
+.view-climb-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--secondary-bg);
+    border: 2px solid var(--text-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(2, 21, 38, 0.3);
+}
+
+/* Header Section */
+.view-climb-heading {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.view-climb-heading h1 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* Details Grid */
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Individual Detail Boxes */
+.detail-box {
+    background-color: rgba(2, 21, 38, 0.4);
+    border: 1px solid var(--tertiary-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.detail-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(110, 172, 218, 0.2);
+}
+
+/* Detail Labels */
+.detail-label {
+    font-weight: 600;
+    color: var(--tertiary-bg);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Detail Values */
+.detail-value {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    font-weight: 500;
+    word-wrap: break-word;
+}
+
+/* Special styling for completion status */
+.detail-box:has(.detail-label:contains("Completed")) .detail-value {
+    font-weight: 700;
+}
+
+.detail-value:contains("Yes") {
+    color: #28a745;
+}
+
+.detail-value:contains("No") {
+    color: #ffc107;
+}
+
+/* Actions Section */
+.view-climb-actions {
+    text-align: center;
+    padding-top: 1rem;
+    /* border-top: 1px solid var(--tertiary-bg); */
+}
+
+/* Button Styling */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-secondary {
+    background-color: var(--tertiary-bg);
+    color: var(--primary-bg);
+    border-color: var(--tertiary-bg);
+}
+
+.btn-secondary:hover {
+    background-color: transparent;
+    color: var(--tertiary-bg);
+    border-color: var(--tertiary-bg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .view-climb-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .detail-box {
+        padding: 1rem;
+    }
+    
+    .view-climb-heading h1 {
+        font-size: 1.5rem;
+    }
+}
