@@ -11,13 +11,24 @@
     </head>
     <body class="navbar-styled">
         <nav class="navbar">
-            <div>
-                <a href="/"> Home </a>
+                <div>
+                    <div class="home-button">
+                        <a href="/" title="Home">
+                            <img src="/static/icons/home.svg" alt="Home" class="nav-icon">
+                        </a>
+                    </div>
+                    <!-- <div class="creator-link">
+                        <a href="https://hariviggy.com" title="Portfolio"> Portfolio </a>
+                    </div> -->
                 </div>
                 <div class="nav-links">
                     {% if request.session.get('user_id') %}
-                        <a href="/user/my_tracker">Dashboard</a>
-                        <a href="/auth/logout">Logout</a>
+                        <a href="/user/my_tracker" title="Dashboard">
+                            <img src="/static/icons/dashboard.svg" alt="Dashboard" class="nav-icon">
+                        </a>
+                        <a href="/auth/logout" title="Logout">
+                            <img src="/static/icons/logout.svg" alt="Logout" class="nav-icon">
+                        </a>
                     {% else %}
                         <a href="/auth/google/login">Login</a>
                     {% endif %}
