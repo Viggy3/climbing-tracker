@@ -36,9 +36,16 @@
 
             </nav>
             <main>
+                <!-- Loading overlay -->
                 {% block content %}{% endblock %}
-
+                
             </main>
             {% block extra_scripts %}{% endblock %}
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="loading-content">
+                    <img src="/static/icons/loading.svg" alt="Loading..." class="loading-svg">
+                    <p>Loading...</p>
+                </div>
+            </div>
         </body>
 </html>

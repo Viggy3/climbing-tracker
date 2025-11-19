@@ -14,7 +14,7 @@
                 <p>Fill in the details below to add a new climb to your tracker.</p>
             </div>
             <div class="new-tracker-form">
-                <form action="/api/create_tracker" method="post" autocomplete="off">
+                <form action="/api/create_tracker" method="post" enctype="multipart/form-data" autocomplete="off">
                     <div class="form-group">
                         <label for="climb_name">Climb Name:</label>
                         <input type="text" id="climb_name" name="climb_name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
@@ -86,13 +86,21 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="date">Date:</label>
+                        <label for="date">Date: (Optional)</label>
                         <input type="date" id="date" name="date">
                     </div>
                     
                     <div class="form-group">
                         <label for="description">Additional Notes (Optional):</label>
                         <textarea id="description" name="description" rows="3" placeholder="Any additional details about this climb..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="media_files">Media (Optional):</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="media_files" name="media_files" multiple accept="image/*,video/*" style="display: none;">
+                            <button type="button" id="add_media_btn" class="btn btn-outline">Add Photos/Videos</button>
+                            <div id="selected_files" class="selected-files-list"></div>
+                        </div>
                     </div>
 
                     <!-- Two-column row for attempts and completed -->
@@ -116,47 +124,8 @@
         </div>
     </div>
 {% block scripts %}
-    <script>
-    (function () {
-        const gradingSystem = document.getElementById('grading_system');
-        const gradeSelect = document.getElementById('grade');
-        const vOptions = Array.from(document.querySelectorAll('.v-option'));
-        const fontOptions = Array.from(document.querySelectorAll('.font-option'));
-
-        function setSystem(system) {
-        if (system === 'v_grade') {
-            // show/enable V, hide/disable Font
-            vOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
-            fontOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
-
-            // pick first enabled v option if current selection was font or invalid
-            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V') === false) {
-            const first = vOptions.find(o => !o.disabled);
-            if (first) gradeSelect.value = first.value;
-            }
-        } else {
-            // show/enable Font, hide/disable V
-            fontOptions.forEach(opt => { opt.disabled = false; opt.hidden = false; });
-            vOptions.forEach(opt => { opt.disabled = true; opt.hidden = true; });
-
-            // pick first enabled font option if current selection was v or invalid
-            if (!gradeSelect.value || gradeSelect.value.toUpperCase().startsWith('V')) {
-            const first = fontOptions.find(o => !o.disabled);
-            if (first) gradeSelect.value = first.value;
-            }
-        }
-        // ensure required still works
-        gradeSelect.required = true;
-        }
-
-        // initial setup on load
-        setSystem(gradingSystem.value);
-
-        // listen for changes
-        gradingSystem.addEventListener('change', (e) => {
-        setSystem(e.target.value);
-        });
-    })();
-    </script>
+    <script src="/static/js/new_tracker.js"> 
+    
+</script>
     {% endblock%}
     {% endblock %}

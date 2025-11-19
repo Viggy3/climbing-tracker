@@ -38,11 +38,48 @@
                         <span class="detail-label">Completed</span>
                         <span class="detail-value">{{ "Yes" if climb.complete else "No" }}</span>
                     </div>
+                    <div class="media-section">
+                        <h3>
+                            Photos and Videos
+                        </h3>
+                        {% if has_media %}
+                            <div class="media-strip">
+                                {% for media in media_files %}
+                                    <div class="media-item">
+                                        {% if media.mime.startswith('image/') %}
+                                            <img src="{{ media.url }}" alt="{{ media.filename }}" class="media-thumb">
+                                            
+                                        {% elif media.mime.startswith('video/') %}
+                                        <div class="media-thumb video-wrapper">
+                                            <video controls class="media-thumb">
+                                                <source src="{{ media.url }}" type="{{ media.mime }}">
+                                            </video>
+                                        </div>
+                                        {% else %}
+                                            <a href="{{ media.url }}" target="_blank">{{ media.filename }}</a>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No media available for this climb.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             <div class="view-climb-actions">
                 <a href="/user/my_tracker" class="btn btn-secondary">Back to Dashboard</a>
             </div>
+            <div class="media-modal hidden" id="media-modal"> 
+                <div class = "media-modal-background">
+                </div>
+                <div class = "media-modal-content">
+
+                </div>
+            </div>
         </div>
     </div>
-{% endblock %}
+    {% endblock %}
+    {% block extra_scripts%}
+    <script src="/static/js/view_climb.js"></script>
+    {% endblock%}

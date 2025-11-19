@@ -177,12 +177,15 @@ select option {
     background-color: var(--primary-bg);
     color: var(--text-color);
     padding: 8px;
+    font-size: 16px;
+    font-weight: normal;
 }
 
 select optgroup {
     background-color: var(--secondary-bg);
     color: var(--text-color);
     font-weight: bold;
+    font-size: 16px;
 }
 
 /* Textarea */
@@ -380,4 +383,260 @@ form br {
 .v-grade-options[style*="display: none"],
 .font-grade-options[style*="display: none"] {
     display: none !important;
+}
+
+
+
+
+/* File Upload Styles */
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--tertiary-bg);
+    border: 2px solid var(--tertiary-bg);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: fit-content;
+}
+
+.btn-outline:hover {
+    background-color: var(--tertiary-bg);
+    color: var(--primary-bg);
+}
+
+.selected-files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: rgba(2, 21, 38, 0.4);
+    border: 1px solid var(--tertiary-bg);
+    border-radius: 6px;
+    color: var(--text-color);
+}
+
+.file-name {
+    font-size: 0.9rem;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove-file-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.remove-file-btn:hover {
+    background-color: #ff5252;
+}
+
+/* Existing Media Items Styling */
+.existing-media-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: rgba(2, 21, 38, 0.4);
+    border: 1px solid var(--tertiary-bg);
+    border-radius: 6px;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.existing-media-item a {
+    font-size: 0.9rem;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.existing-media-item a:hover {
+    color: var(--tertiary-bg);
+    text-decoration: underline;
+}
+
+.remove-existing-media-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.remove-existing-media-btn:hover {
+    background-color: #ff5252;
+}
+
+/* Undo remove button styling */
+.undo-remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.undo-remove-btn:hover {
+    background-color: #218838;
+    transform: scale(1.1);
+}
+
+.undo-remove-btn:active {
+    transform: scale(0.95);
+}
+
+/* Media items marked for deletion */
+.media-item.marked-for-deletion {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.media-item.marked-for-deletion::after {
+    content: "Will be deleted";
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    right: 4px;
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+    font-size: 10px;
+    text-align: center;
+    padding: 2px;
+    border-radius: 2px;
+}
+
+/* Responsive sizing for undo button */
+@media (min-width: 1200px) {
+    .undo-remove-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        top: 8px;
+        right: 8px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .undo-remove-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .undo-remove-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        top: 6px;
+        right: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .undo-remove-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+        top: 4px;
+        right: 4px;
+    }
+}
+
+/* Responsive sizing for remove button to match undo button */
+@media (min-width: 1200px) {
+    .remove-existing-media-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+        top: 8px;
+        right: 8px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .remove-existing-media-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .remove-existing-media-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        top: 6px;
+        right: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .remove-existing-media-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+        top: 4px;
+        right: 4px;
+    }
 }

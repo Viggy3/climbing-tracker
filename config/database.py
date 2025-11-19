@@ -26,7 +26,7 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client[DATABASE_NAME]
 trackers_collection = db[COLLECTION_NAME]  # Fixed: renamed from collection_name to collection
 users_collection = db["users"]  # Collection for user authentication data
-
+media_collection = db["media"]  # Collection for media files metadata
 
 
 def test_connection():

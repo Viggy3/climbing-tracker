@@ -6,7 +6,43 @@
     --text-color: #E2E2B6;      /* Light text/borders */
 }
 
-/* Base Body Styling */
+/* Base Body Styling *//* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(2, 21, 38, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+.loading-content {
+    text-align: center;
+    color: var(--text-color);
+}
+
+.loading-content p {
+    margin-top: 1rem;
+    font-size: 18px;
+    color: var(--text-color);
+}
+
+/* Loading SVG - using custom loading.svg */
+.loading-svg {
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin: 0 auto;
+}
 body {
     font-family: Arial, sans-serif;
     margin: 0;
