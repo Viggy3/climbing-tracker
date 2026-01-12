@@ -69,11 +69,11 @@ from router.api_route import api_router
 async def read_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Favicon route to prevent 404 errors
+# Favicon route to serve the actual favicon
 @app.get("/favicon.ico")
 async def favicon():
-    from fastapi.responses import Response
-    return Response(status_code=204)  # No Content - tells browser no favicon available
+    from fastapi.responses import FileResponse
+    return FileResponse("static/favicon.ico", media_type="image/x-icon")
 
 # Redirect /login to /auth/login
 @app.get("/login")
