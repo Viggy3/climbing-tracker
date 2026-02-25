@@ -1,5 +1,6 @@
 from config.r2_storage import  get_r2, upload_to_storage, delete_from_r2
 import token
+from main import limiter
 import hmac
 import hashlib
 from datetime import datetime, timezone, timedelta
@@ -39,6 +40,7 @@ async def new_tracker_page(request: Request):
 
 # POST request to add a new tracker
 @api_router.post("/create_tracker")
+@limiter.limit("10/minute")  # Limit to 10 tracker creations per minute per IP
 async def create_tracker(request: Request, background_tasks: BackgroundTasks):
     try:
         user_id = request.session.get('user_id')
@@ -98,6 +100,7 @@ async def create_tracker(request: Request, background_tasks: BackgroundTasks):
 
 # Additional API routes can be added here
 @api_router.get("/edit_tracker/{tracker_id}")
+@limiter.limit("20/minute")  # Limit to 20 tracker edits per minute per IP
 async def edit_tracker(tracker_id: str, request: Request):
     try:
         user_id = request.session.get('user_id')
@@ -128,6 +131,7 @@ async def edit_tracker(tracker_id: str, request: Request):
     
 
 @api_router.post("/update_tracker/{tracker_id}")
+@limiter.limit("20/minute")  # Limit to 20 tracker updates per minute per IP
 async def update_tracker(tracker_id: str, request: Request, background_tasks: BackgroundTasks):
     try:
         user_id = request.session.get('user_id')
@@ -216,6 +220,7 @@ async def view_climb(tracker_id: str, request: Request):
         return RedirectResponse(url="/user/my_tracker", status_code=302)
     
 @api_router.delete("/delete_media/{media_id}")
+@limiter.limit("10/minute")  # Limit to 10 media deletions per minute per IP
 async def delete_media(media_id: str, request: Request):
     try:
         user_id = request.session.get('user_id')
@@ -251,6 +256,7 @@ async def delete_media(media_id: str, request: Request):
         return {"error" : str(e), "success": False}, 500
 
 @api_router.delete("/delete_tracker/{tracker_id}")
+@limiter.limit("5/minute")  # Limit to 5 tracker deletions per minute per IP
 async def delete_tracker(tracker_id: str, request: Request):
     print(f" Received request to delete tracker {tracker_id}")
     try:
@@ -288,6 +294,7 @@ async def new_tracker_id(request: Request):
     return {"tracker_id": str(ObjectId())}
 
 @api_router.post("/get_upload_url")
+@limiter.limit("10/minute")  # Limit to 10 upload URL generations per minute per IP prevent cost exertion
 async def get_upload_url(request: Request):
     user_id = request.session.get('user_id')
     if not user_id:
