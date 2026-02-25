@@ -23,10 +23,6 @@ templates = Jinja2Templates(directory="templates")
 
 api_router = APIRouter()
 
-@api_router.get("/test_rate_limit")
-@limiter.limit("5/minute")
-async def test_rate_limit(request: Request):
-    return JSONResponse({"ok": True, "ip": request.client.host})
 
 def generate_signed_url(key, expires_in=900):
     """Generate a temporary presigned GET URL for an R2 object"""
