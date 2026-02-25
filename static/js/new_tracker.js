@@ -203,13 +203,31 @@ function uploadWithProgress(url, file, onProgress) {
                 await uploadWithProgress(upload_url, file, (percent) => {
                     submitBtn.innerHTML = `<span class="spinner-small"></span> Uploading... ${percent}%`;
                 });
+
+                let thumbnail_key = null;
+                if (file.type.startsWith('video/')) {
+                    const thumbnailBlob = await generateVideoThumbnail(file);
+                    const thumbRes = await fetch('/api/get_upload_url', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename: 'thumbnail.jpg', content_type: 'image/jpeg', tracker_id })
+                    });
+                    const { upload_url: thumbUrl, key: thumbKey } = await thumbRes.json();
+                    await fetch(thumbUrl, {
+                        method: 'PUT',
+                        body: thumbnailBlob,
+                        headers: { 'Content-Type': 'image/jpeg' }
+                    });
+                    thumbnail_key = thumbKey;
+                }
                 
                 console.log(upload_url);
                 uploadedMedia.push({
                     filename: file.name,
                     key: key,
                     content_type: file.type,
-                    size: file.size
+                    size: file.size,
+                    thumbnail_key: thumbnail_key
                 });
             }
 
@@ -255,3 +273,24 @@ function uploadWithProgress(url, file, onProgress) {
     });
 
 })();
+
+async function generateVideoThumbnail(file) {
+    return new Promise((resolve) => {
+        const video = document.createElement('video');
+        const canvas = document.createElement('canvas');
+        
+        video.src = URL.createObjectURL(file); // load from local file, not R2
+        video.currentTime = 1; // seek to 1 second
+        
+        video.oncanplay = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                URL.revokeObjectURL(video.src); // cleanup memory
+                resolve(blob);
+            }, 'image/jpeg', 0.8);
+        };
+    });
+}

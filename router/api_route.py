@@ -1,4 +1,4 @@
-from config.r2_storage import generate_thumbnail, get_r2, upload_to_storage, delete_from_r2
+from config.r2_storage import  get_r2, upload_to_storage, delete_from_r2
 import token
 import hmac
 import hashlib
@@ -68,9 +68,8 @@ async def create_tracker(request: Request, background_tasks: BackgroundTasks):
             result = media_collection.insert_one(media_doc)
             media_ids.append(result.inserted_id)
 
-            if media["content_type"].startswith("video/"):
-                background_tasks.add_task(generate_and_save_thumbnail, media["key"], user_id, str(tracker_id), result.inserted_id)
-            
+            if media.get("thumbnail_key"):
+                thumbnail_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['thumbnail_key']}"
         
         if media_ids:
             tracker_data["media_ids"] = media_ids
@@ -88,13 +87,7 @@ async def create_tracker(request: Request, background_tasks: BackgroundTasks):
         print(f"Error creating tracker: {e}")
         return JSONResponse({"error": "Failed to create tracker."}, status_code=500)
 
-def generate_and_save_thumbnail(video_key, user_id, tracker_id, media_id):
-    thumbnail_url = generate_thumbnail(video_key, user_id, tracker_id)
-    if thumbnail_url:
-        media_collection.update_one(
-            {"_id": media_id},
-            {"$set": {"thumbnail": thumbnail_url}}
-        )
+
 
 # Additional API routes can be added here
 @api_router.get("/edit_tracker/{tracker_id}")
@@ -126,7 +119,7 @@ async def edit_tracker(tracker_id: str, request: Request):
     
 
 @api_router.post("/update_tracker/{tracker_id}")
-async def update_tracker(tracker_id: str, request: Request):
+async def update_tracker(tracker_id: str, request: Request, background_tasks: BackgroundTasks):
     try:
         user_id = request.session.get('user_id')
         if not user_id:
@@ -148,8 +141,8 @@ async def update_tracker(tracker_id: str, request: Request):
             worker_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['key']}"
 
             thumbnail_url = None
-            if media["content_type"].startswith("video/"):
-                thumbnail_url = generate_thumbnail(media["key"], user_id, str(tracker_id))
+            if media.get("thumbnail_key"):
+                thumbnail_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['thumbnail_key']}"
             media_doc = {
                 "filename": media["filename"],
                 "key": worker_url,
