@@ -63,7 +63,7 @@ async def create_tracker(request: Request, background_tasks: BackgroundTasks):
         media_ids=[]
         for media in body.get("media_files", []):
             worker_url = media['key']
-            thumbnail_url = media['thumbnail'] if media.get("thumbnail") else None
+            thumbnail_url = media.get('thumbnail_key')
             
             media_doc = {
                 "filename": media["filename"],
@@ -113,8 +113,8 @@ async def edit_tracker(tracker_id: str, request: Request):
     
         for doc in media_docs:
             doc["url"] = generate_signed_url(doc["key"])
-        if doc.get("thumbnail"):
-                doc["thumbnail_url"] = generate_signed_url(doc["thumbnail"])
+            if doc.get("thumbnail"):
+                    doc["thumbnail_url"] = generate_signed_url(doc["thumbnail"])
         context = {
             "request": request,
             "climb": climb_data,
@@ -149,7 +149,7 @@ async def update_tracker(tracker_id: str, request: Request, background_tasks: Ba
         for media in body.get("media_files", []):
             worker_url = media['key']
 
-            thumbnail_url = media['thumbnail'] if media.get("thumbnail") else None
+            thumbnail_url = media.get('thumbnail_key')
             media_doc = {
                 "filename": media["filename"],
                 "key": worker_url,
@@ -202,8 +202,8 @@ async def view_climb(tracker_id: str, request: Request):
     
         for doc in media_docs:
             doc["url"] = generate_signed_url(doc["key"])
-        if doc.get("thumbnail"):
-            doc["thumbnail_url"] =generate_signed_url(doc["thumbnail"])
+            if doc.get("thumbnail"):
+                doc["thumbnail_url"] =generate_signed_url(doc["thumbnail"])
         context = {
             "request": request,
             "climb": climb_data,
