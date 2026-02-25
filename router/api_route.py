@@ -22,6 +22,16 @@ templates = Jinja2Templates(directory="templates")
 
 api_router = APIRouter()
 
+def generate_signed_url(key, expires_in=900):
+    """Generate a temporary presigned GET URL for an R2 object"""
+    s3_client = get_r2()
+    bucket_name = os.getenv("CLOUDFLARE_R2_BUCKET_NAME")
+    return s3_client.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': bucket_name, 'Key': key},
+        ExpiresIn=expires_in
+    )
+
 #display page for creating new tracker
 @api_router.get("/new_tracker")
 async def new_tracker_page(request: Request):
@@ -52,8 +62,8 @@ async def create_tracker(request: Request, background_tasks: BackgroundTasks):
 
         media_ids=[]
         for media in body.get("media_files", []):
-            worker_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['key']}"
-            thumbnail_url = None
+            worker_url = media['key']
+            thumbnail_url = media['thumbnail'] if media.get("thumbnail") else None
             
             media_doc = {
                 "filename": media["filename"],
@@ -68,9 +78,6 @@ async def create_tracker(request: Request, background_tasks: BackgroundTasks):
             result = media_collection.insert_one(media_doc)
             media_ids.append(result.inserted_id)
 
-            if media.get("thumbnail_key"):
-                thumbnail_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['thumbnail_key']}"
-        
         if media_ids:
             tracker_data["media_ids"] = media_ids
 
@@ -105,7 +112,9 @@ async def edit_tracker(tracker_id: str, request: Request):
         print(f"Found {len(media_docs)} media files for tracker {tracker_id}")
     
         for doc in media_docs:
-            doc["url"] = f"https://{doc['key']}"
+            doc["url"] = generate_signed_url(doc["key"])
+        if doc.get("thumbnail"):
+                doc["thumbnail_url"] = generate_signed_url(doc["thumbnail"])
         context = {
             "request": request,
             "climb": climb_data,
@@ -138,11 +147,9 @@ async def update_tracker(tracker_id: str, request: Request, background_tasks: Ba
 
         # Save any newly uploaded media metadata
         for media in body.get("media_files", []):
-            worker_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['key']}"
+            worker_url = media['key']
 
-            thumbnail_url = None
-            if media.get("thumbnail_key"):
-                thumbnail_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['thumbnail_key']}"
+            thumbnail_url = media['thumbnail'] if media.get("thumbnail") else None
             media_doc = {
                 "filename": media["filename"],
                 "key": worker_url,
@@ -187,7 +194,6 @@ async def view_climb(tracker_id: str, request: Request):
             print(" Climb not found or access denied.") 
             return RedirectResponse(url="/user/my_tracker", status_code=302)
         
-        media_url_prefix = os.getenv("CLOUDFLARE_R2_MEDIAURL", "")
 
 
 
@@ -195,8 +201,9 @@ async def view_climb(tracker_id: str, request: Request):
         print(f"Found {len(media_docs)} media files for tracker {tracker_id}")
     
         for doc in media_docs:
-            doc["url"] = f"https://{doc['key']}"
-
+            doc["url"] = generate_signed_url(doc["key"])
+        if doc.get("thumbnail"):
+            doc["thumbnail_url"] =generate_signed_url(doc["thumbnail"])
         context = {
             "request": request,
             "climb": climb_data,

@@ -61,9 +61,7 @@ def upload_to_storage(file, tracker_id, user_id, unique_filename=None):
         )
         
         # Upload successful to R2, but return worker URL for serving
-        worker_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{unique_filename}"
-        print(f"Upload successful to R2, serving via worker: {worker_url}")
-        return worker_url
+        return unique_filename 
         
     except (NoCredentialsError, ClientError) as e:
         print(f"❌ R2 Upload Failed - Credentials Error: {e}")
@@ -75,25 +73,17 @@ def upload_to_storage(file, tracker_id, user_id, unique_filename=None):
 
 
 def delete_from_r2(media_key):
-    try: 
-        r2  = get_r2()
+    try:
+        r2 = get_r2()
         bucket_name = os.getenv("CLOUDFLARE_R2_BUCKET_NAME")
-
         if media_key is None:
             print("❌ R2 Deletion Failed - media_key is None")
             return False
-        if media_key.startswith("tracker-media-proxy.hariviggy333.workers.dev/media/"):
-            r2_key = media_key.split("/media/")[1]
-        else:
-            r2_key = media_key
-        print(f"Deleting from R2 - Bucket: {bucket_name}, Key: {r2_key}")
-        r2.delete_object(Bucket=bucket_name, Key=r2_key)
+        print(f"Deleting from R2 - Bucket: {bucket_name}, Key: {media_key}")
+        r2.delete_object(Bucket=bucket_name, Key=media_key)
         print("✅ R2 Deletion Successful")
         return True
     except (NoCredentialsError, ClientError) as e:
-        print(f"❌ R2 Deletion Failed - Credentials Error: {e}")
-        return False
-    except Exception as e:
-        print(f"❌ R2 Deletion Failed - Unexpected Error: {e}")
+        print(f"❌ R2 Deletion Failed: {e}")
         return False
 
