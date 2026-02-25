@@ -1,6 +1,6 @@
 from config.r2_storage import  get_r2, upload_to_storage, delete_from_r2
 import token
-from main import limiter
+from config.limiter import limiter
 import hmac
 import hashlib
 from datetime import datetime, timezone, timedelta
