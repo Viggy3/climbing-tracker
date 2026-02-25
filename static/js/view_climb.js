@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".media-thumb").forEach((thumb) => {
         thumb.addEventListener("click", () => {
              console.log("Clicked thumb:", thumb.tagName, thumb.className);
-            modalContent.innerHTML = ""; // Clear previous content
+            // modalContent.innerHTML = ""; // Clear previous content
             
             if (thumb.tagName.toLowerCase() === "img") {
                 const img = document.createElement("img");
@@ -17,15 +17,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 modalContent.appendChild(img);
             } else if (thumb.classList.contains("video-wrapper")) {
                 // Video wrapper div - find the video inside
-                const videoElement = thumb.querySelector("video");
-                if (videoElement) {
-                    // Create new video element instead of cloning
+                
+                 const videoElement = thumb.querySelector("video");
+                const videoSrc = videoElement.querySelector("source")?.src || videoElement.src;
+                
+                // Only create if not already loaded with this src
+                const existingVideo = modalContent.querySelector("video");
+                if (!existingVideo || existingVideo.querySelector("source")?.src !== videoSrc) {
+                    modalContent.innerHTML = ""; // clear only if different video
                     const video = document.createElement("video");
                     video.className = "modal-media";
                     video.controls = true;
                     video.preload = "metadata";
-                    
-                    // Copy all source elements
                     const sources = videoElement.querySelectorAll("source");
                     sources.forEach(source => {
                         const new_source = document.createElement("source");
@@ -33,16 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         new_source.type = source.type;
                         video.appendChild(new_source);
                     });
-                    
-                    // If no sources, set src directly
-                    if (sources.length === 0 && videoElement.src) {
-                        video.src = videoElement.src;
-                    }
-                    
                     modalContent.appendChild(video);
-                    
-                    // Load the video to ensure controls work
-                    video.load();
+                    // video.load();
+    
                 }
             } else if (thumb.tagName.toLowerCase() === "video") {
                 // Direct video element (backup case)
@@ -52,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 video.preload = "metadata";
                 video.src = thumb.src || thumb.querySelector("source")?.src;
                 modalContent.appendChild(video);
-                video.load();
+                // video.load();
             }
 
             modal.classList.remove("hidden");
@@ -62,7 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     background.addEventListener("click", () => {
         modal.classList.add("hidden");
-        modalContent.innerHTML = ""; // Clear content on close
+        // modalContent.innerHTML = ""; // Clear content on close
+        const video = modalContent.querySelector("video");
+        if (video) video.pause();
     });
         
 });

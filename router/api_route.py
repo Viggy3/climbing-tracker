@@ -1,8 +1,12 @@
-from config.r2_storage import upload_to_storage, delete_from_r2
+from config.r2_storage import generate_thumbnail, get_r2, upload_to_storage, delete_from_r2
 import token
+import hmac
+import hashlib
+from datetime import datetime, timezone, timedelta
+from urllib.parse import quote
 import uuid
-from fastapi import APIRouter, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Request, BackgroundTasks
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from starlette.config import Config
 from authlib.integrations.starlette_client import OAuth
@@ -25,97 +29,71 @@ async def new_tracker_page(request: Request):
 
 # POST request to add a new tracker
 @api_router.post("/create_tracker")
-async def create_tracker(request: Request):
+async def create_tracker(request: Request, background_tasks: BackgroundTasks):
     try:
-        # Get form data instead of JSON
-        form_data = await request.form()
-        
-        # Extract user_id from session
         user_id = request.session.get('user_id')
+
         if not user_id:
             return RedirectResponse(url="/auth/login", status_code=302)
-        
-        # Create tracker data from form
-        user_description = form_data.get("description", "").strip()
-        
-        # Combine grade info with user notes
-        if user_description:
-            full_description = user_description
-        else:
-            full_description = "No additional notes."
-        
-        tracker_id = ObjectId()
-        
+        body = await request.json()
+        user_description = body.get("description", "").strip() or "No additional notes."
+        tracker_id = ObjectId(body.get("tracker_id"))
+
+
         tracker_data = {
-            "name": form_data.get("climb_name"),
-            "description": full_description,
-            "date": form_data.get("date"),
-            "attempts": form_data.get("attempts", 1),  # Default to 1 attempt for new climb
-            "grade": form_data.get("grade"),
-            "complete": form_data.get("complete", False),  # Default to incomplete
-            "user_id": user_id,  # Link to authenticated user
-            "_id": tracker_id
+            "_id": tracker_id,
+            "name": body.get("climb_name"),
+            "description": user_description,
+            "attempts": body.get("attempts", 1),
+            "grade": body.get("grade"),
+            "complete": body.get("complete", False),
+            "user_id": user_id,
         }
 
-        media_files = form_data.getlist("media_files")
-        print(f"🔍 Found {len(media_files)} media files")
-        if media_files:
-            media_ids = []
-            for media_file in media_files:
-                if media_file.filename:
-                    print(f"📁 Processing file: {media_file.filename}")
-                    # Read file content first
-                    file_content = await media_file.read()
-                    file_size = len(file_content)
-                    
-                    # Reset file pointer for upload function
-                    media_file.file.seek(0)
-                    file_extension = os.path.splitext(media_file.filename)[1]
-                    unique_filename = f"{user_id}/{tracker_id}/{uuid.uuid4()}{file_extension}"
-                    file_url = upload_to_storage(media_file, tracker_id, user_id, unique_filename=unique_filename)
-                    
-                    if file_url:  # Only process if upload was successful
-                        print(f"📤 Uploaded to: {file_url}")
-                        
-                        # Create media document
-                        media_doc = {
-                            "filename": media_file.filename,
-                            "key": file_url,
-                            "mime": media_file.content_type,
-                            "size": file_size,
-                            "status": "uploaded",
-                            "tracker_id": str(tracker_id)  # Convert ObjectId to string
-                        }
+        media_ids=[]
+        for media in body.get("media_files", []):
+            worker_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['key']}"
+            thumbnail_url = None
+            
+            media_doc = {
+                "filename": media["filename"],
+                "key": worker_url,
+                "mime": media["content_type"],
+                "size": media["size"],
+                "status": "uploaded",
+                "tracker_id": str(tracker_id),
+                "thumbnail": thumbnail_url 
+            }
 
-                        media_result = media_collection.insert_one(media_doc)
-                        print(f"💾 Saved media doc: {media_result.inserted_id}")
-                        media_ids.append(media_result.inserted_id)
-                    else:
-                        print(f"❌ Skipping file {media_file.filename} - upload failed")
+            result = media_collection.insert_one(media_doc)
+            media_ids.append(result.inserted_id)
+
+            if media["content_type"].startswith("video/"):
+                background_tasks.add_task(generate_and_save_thumbnail, media["key"], user_id, str(tracker_id), result.inserted_id)
+            
+        
+        if media_ids:
             tracker_data["media_ids"] = media_ids
 
-        
-        # Import here to avoid circular imports
         from config.database import trackers_collection
         from datetime import datetime, timezone
-        
-        # Convert date string to datetime if provided
-        if tracker_data["date"]:
-            tracker_data["date"] = datetime.fromisoformat(tracker_data["date"])
-        else:
-            tracker_data["date"] = datetime.now(timezone.utc)
-        
-        # Insert into database
-        result = trackers_collection.insert_one(tracker_data)
-        # Redirect to user dashboard
-        return RedirectResponse(url="/user/my_tracker", status_code=302)
-        
+
+        date_str = body.get("date")
+        tracker_data["date"] = datetime.fromisoformat(date_str) if date_str else datetime.now(timezone.utc)
+
+        trackers_collection.insert_one(tracker_data)
+
+        return JSONResponse({"success": True, "tracker_id": str(tracker_id)})
     except Exception as e:
-        print(f" Error creating tracker: {e}")
-        # Return to form with error
-        return templates.TemplateResponse(
-            "new_tracker.html", 
-            {"request": request, "error": "Failed to create tracker. Please try again."}
+        print(f"Error creating tracker: {e}")
+        return JSONResponse({"error": "Failed to create tracker."}, status_code=500)
+
+def generate_and_save_thumbnail(video_key, user_id, tracker_id, media_id):
+    thumbnail_url = generate_thumbnail(video_key, user_id, tracker_id)
+    if thumbnail_url:
+        media_collection.update_one(
+            {"_id": media_id},
+            {"$set": {"thumbnail": thumbnail_url}}
         )
 
 # Additional API routes can be added here
@@ -149,122 +127,59 @@ async def edit_tracker(tracker_id: str, request: Request):
 
 @api_router.post("/update_tracker/{tracker_id}")
 async def update_tracker(tracker_id: str, request: Request):
-
     try:
-        form_data = await request.form()
-
         user_id = request.session.get('user_id')
         if not user_id:
-            return RedirectResponse(url="/auth/login", status_code=302)
+            return JSONResponse({"error": "Not authenticated"}, status_code=401)
+
+        body = await request.json()
+
         from config.database import trackers_collection
-        from datetime import datetime
-        media_ids = trackers_collection.find_one({"_id": ObjectId(tracker_id), "user_id": user_id}).get("media_ids", [])
+        
+        # Get existing media_ids to preserve them
+        existing = trackers_collection.find_one({"_id": ObjectId(tracker_id), "user_id": user_id})
+        if not existing:
+            return JSONResponse({"error": "Tracker not found"}, status_code=404)
+
+        media_ids = existing.get("media_ids", [])
+
+        # Save any newly uploaded media metadata
+        for media in body.get("media_files", []):
+            worker_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{media['key']}"
+
+            thumbnail_url = None
+            if media["content_type"].startswith("video/"):
+                thumbnail_url = generate_thumbnail(media["key"], user_id, str(tracker_id))
+            media_doc = {
+                "filename": media["filename"],
+                "key": worker_url,
+                "mime": media["content_type"],
+                "size": media["size"],
+                "status": "uploaded",
+                "tracker_id": tracker_id,
+                "thumbnail": thumbnail_url
+            }
+            result = media_collection.insert_one(media_doc)
+            media_ids.append(result.inserted_id)
+
         update_data = {
-            "description": form_data.get("edit_climb_description", "").strip(),
-            "attempts": int(form_data.get("edit_climb_attempts", 1)),
-            "grade": form_data.get("edit_climb_grade"),
-            "complete": form_data.get("edit_climb_complete") == "on",
+            "grade": body.get("edit_climb_grade"),
+            "description": body.get("edit_climb_description", "").strip() or "No additional notes.",
+            "attempts": int(body.get("edit_climb_attempts", 1)),
+            "complete": body.get("edit_climb_complete", False),
             "media_ids": media_ids,
         }
-        media_files = form_data.getlist("media_files")
-        print(f"Found {len(media_files)} media files to upload")
-        
-        # Get existing media keys with error handling
-        try:
-            existing_media_keys = {doc["key"] for doc in media_collection.find({"tracker_id": tracker_id}, {"key": 1})}
-            print(f" {len(existing_media_keys)} existing media files ")
-        except Exception as e:
-            print(f"Error fetching existing media keys: {e}")
-            existing_media_keys = set()  # Continue with empty set
-        
-        # Process each media file with individual error handling
-        successful_uploads = 0
-        failed_uploads = 0
-        print(f"Total media_files received: {len(media_files)}")
-        for i, media in enumerate(media_files):
-            print(f"Processing media file #{i}: {media}")
-            print(f"Filename: '{media.filename}' (type: {type(media.filename)})")
-            print(f"Content type: {getattr(media, 'content_type', 'None')}")
-            
-            # More specific check for empty files
-            if not media.filename or media.filename.strip() == "":
-                print(f" Skipping empty file entry #{i}")
-                continue
-                
-            try:
-                print(f" Processing file: {media.filename}")
 
-                # Generate unique filename and worker URL
-                file_extension = os.path.splitext(media.filename)[1]
-                unique_filename = f"{user_id}/{tracker_id}/{uuid.uuid4()}{file_extension}"
-                worker_url = f"tracker-media-proxy.hariviggy333.workers.dev/media/{unique_filename}"
-                duplicate_check = f"{media.filename}_{file_size}"
-                existing_files = {f"{doc['filename']}_{doc['size']}" for doc in media_collection.find({"tracker_id": tracker_id})}
-                if duplicate_check in existing_files:
-                    print(f"Duplicate file detected: {media.filename}")
-                    continue
-                
-
-                # Read file content and reset pointer
-                try:
-                    file_content = await media.read()
-                    file_size = len(file_content)
-                    media.file.seek(0)
-                except Exception as read_error:
-                    print(f"Error reading file {media.filename}: {read_error}")
-                    failed_uploads += 1
-                    continue
-
-                # Upload to R2
-                try:
-                    file_url = upload_to_storage(media, tracker_id, user_id, unique_filename=unique_filename)
-                except Exception as upload_error:
-                    print(f"Upload failed for {media.filename}: {upload_error}")
-                    failed_uploads += 1
-                    continue
-
-                if file_url:
-                    try:
-                        # Create and save media document
-                        media_doc = {
-                            "filename": media.filename,
-                            "key": file_url,
-                            "mime": media.content_type,
-                            "size": file_size,
-                            "status": "uploaded",
-                            "tracker_id": str(tracker_id)
-                        }
-
-                        media_result = media_collection.insert_one(media_doc)
-                        media_ids.append(media_result.inserted_id)
-                        successful_uploads += 1
-                        print(f"Successfully processed: {media.filename}")
-                        
-                    except Exception as db_error:
-                        print(f"Database save failed for {media.filename}: {db_error}")
-                        failed_uploads += 1
-                else:
-                    print(f"Upload returned no URL for {media.filename}")
-                    failed_uploads += 1
-                    
-            except Exception as e:
-                print(f"Unexpected error processing {media.filename}: {e}")
-                failed_uploads += 1
-                continue
-        
-        print(f"Media processing complete: {successful_uploads} successful, {failed_uploads} failed")
-                    
-
-        print(form_data.items())
         trackers_collection.update_one(
             {"_id": ObjectId(tracker_id), "user_id": user_id},
             {"$set": update_data}
         )
 
-        return RedirectResponse(url="/user/my_tracker", status_code=302)
+        return JSONResponse({"success": True})
+
     except Exception as e:
-        print(f"error updating database climb {tracker_id}: {e}")
-        return RedirectResponse(url="/user/my_tracker", status_code=302)
+        print(f"Error updating tracker {tracker_id}: {e}")
+        return JSONResponse({"error": "Failed to update tracker."}, status_code=500)
 
 
 @api_router.get("/view_climb/{tracker_id}")
@@ -364,3 +279,90 @@ async def delete_tracker(tracker_id: str, request: Request):
     except Exception as e:
         print(f" Error deleting tracker: {e}")
         return {"error" : str(e), "success": False}, 500
+    
+@api_router.get("/new_tracker_id")
+async def new_tracker_id(request: Request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return RedirectResponse(url="/auth/login", status_code=302)
+    return {"tracker_id": str(ObjectId())}
+
+@api_router.post("/get_upload_url")
+async def get_upload_url(request: Request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JSONResponse({"error": "Not authenticated"}, status_code=401)
+
+    body = await request.json()
+    filename = body.get("filename")
+    content_type = body.get("content_type")
+    tracker_id = body.get("tracker_id")
+
+    file_extension = os.path.splitext(filename)[1]
+    unique_key = f"{user_id}/{tracker_id}/{uuid.uuid4()}{file_extension}"
+
+    account_id = os.getenv('CLOUDFLARE_R2_ACCOUNT_ID')
+    access_key = os.getenv("CLOUDFLARE_R2_ACCESS_KEY_ID")
+    secret_key = os.getenv("CLOUDFLARE_R2_SECRET_ACCESS_KEY")
+    bucket_name = os.getenv("CLOUDFLARE_R2_BUCKET_NAME")
+
+    host = f"{bucket_name}.{account_id}.r2.cloudflarestorage.com"
+    now = datetime.now(timezone.utc)
+    datestamp = now.strftime('%Y%m%d')
+    amzdate = now.strftime('%Y%m%dT%H%M%SZ')
+    expires = 3600
+
+    credential_scope = f"{datestamp}/auto/s3/aws4_request"
+    credential = f"{access_key}/{credential_scope}"
+
+    signed_headers = "content-type;host"
+
+    canonical_querystring = (
+        f"X-Amz-Algorithm=AWS4-HMAC-SHA256"
+        f"&X-Amz-Credential={quote(credential, safe='')}"
+        f"&X-Amz-Date={amzdate}"
+        f"&X-Amz-Expires={expires}"
+        f"&X-Amz-SignedHeaders={quote(signed_headers, safe='')}"
+    )
+
+    canonical_headers = f"content-type:{content_type}\nhost:{host}\n"
+    canonical_request = "\n".join([
+        "PUT",
+        f"/{unique_key}",
+        canonical_querystring,
+        canonical_headers,
+        signed_headers,
+        "UNSIGNED-PAYLOAD"
+    ])
+
+    string_to_sign = "\n".join([
+        "AWS4-HMAC-SHA256",
+        amzdate,
+        credential_scope,
+        hashlib.sha256(canonical_request.encode()).hexdigest()
+    ])
+
+    def sign(key, msg):
+        return hmac.new(key, msg.encode(), hashlib.sha256).digest()
+
+    signing_key = sign(sign(sign(sign(f"AWS4{secret_key}".encode(), datestamp), "auto"), "s3"), "aws4_request")
+    signature = hmac.new(signing_key, string_to_sign.encode(), hashlib.sha256).hexdigest()
+
+    presigned_url = (
+        f"https://{host}/{unique_key}"
+        f"?{canonical_querystring}"
+        f"&X-Amz-Signature={signature}"
+    )
+    print(f"Generated presigned URL: {presigned_url}")
+
+    return JSONResponse({"upload_url": presigned_url, "key": unique_key})
+
+
+@api_router.get("/check_ffmpeg")
+async def check_ffmpeg(request: Request):
+    try:
+        import imageio_ffmpeg
+        ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+        return JSONResponse({"available": True, "path": ffmpeg_path})
+    except Exception as e:
+        return JSONResponse({"available": False, "error": str(e)})
