@@ -105,7 +105,7 @@
                                             <button type="button" class="remove-existing-media-btn" data-media-id="{{ media._id }}">×</button>
                                         {% elif media.mime.startswith('video/') %}
                                         <div class="media-thumb video-wrapper">
-                                            <video controls class="media-thumb" preload="none" {% if media.thumbnail %}poster="https://{{ media.thumbnail }}"{% endif %}>
+                                            <video controls class="media-thumb" preload="none" {% if media.thumbnail_url %}poster="{{ media.thumbnail_url }}"{% endif %}>
                                                 <source src="{{ media.url }}" type="{{ media.mime }}">
                                             </video>
                                         </div>
