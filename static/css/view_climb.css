@@ -127,6 +127,13 @@
     border-color: var(--tertiary-bg);
 }
 
+.modal-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .view-climb-container {

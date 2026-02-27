@@ -27,10 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const existingVideo = modalContent.querySelector("video");
                 if (!existingVideo || existingVideo.querySelector("source")?.src !== videoSrc) {
                     modalContent.innerHTML = ""; // clear only if different video
-                    const video = document.createElement("video");
-                    video.className = "modal-media";
-                    video.controls = true;
-                    video.preload = "metadata";
+
+                    const wrapper = document.createElement("div");
+                    wrapper.style.position = "relative";
+                    
                     const closeBtn = document.createElement('button');
                         closeBtn.type = 'button';
                         closeBtn.className = 'media-remove-btn modal-close-btn';
@@ -40,7 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             const video = modalContent.querySelector("video");
                             if (video) video.pause();
                     });
-                    video.appendChild(closeBtn);
+
+                    const video = document.createElement("video");
+                    video.className = "modal-media";
+                    video.controls = true;
+                    video.preload = "metadata";
+                    
                     const sources = videoElement.querySelectorAll("source");
                     sources.forEach(source => {
                         const new_source = document.createElement("source");
@@ -48,7 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         new_source.type = source.type;
                         video.appendChild(new_source);
                     });
-                    modalContent.appendChild(video);
+                    wrapper.appendChild(video);
+                    wrapper.appendChild(closeBtn);
+                    modalContent.appendChild(wrapper);
                     // video.load();
     
                 }
