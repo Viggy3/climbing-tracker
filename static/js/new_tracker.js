@@ -207,6 +207,7 @@ function uploadWithProgress(url, file, onProgress) {
                 let thumbnail_key = null;
                 if (file.type.startsWith('video/')) {
                     const thumbnailBlob = await generateVideoThumbnail(file);
+                    if (thumbnailBlob) {
                     const thumbRes = await fetch('/api/get_upload_url', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -219,6 +220,9 @@ function uploadWithProgress(url, file, onProgress) {
                         headers: { 'Content-Type': 'image/jpeg' }
                     });
                     thumbnail_key = thumbKey;
+
+                    console.log('Generated thumbnail for video:', file.name);
+                    }
                 }
                 
                 console.log(upload_url);
@@ -278,19 +282,43 @@ async function generateVideoThumbnail(file) {
     return new Promise((resolve) => {
         const video = document.createElement('video');
         const canvas = document.createElement('canvas');
+        video.muted = true; // mute to avoid autoplay issues
+        video.playsInline = true; // for mobile compatibility
         
-        video.src = URL.createObjectURL(file); // load from local file, not R2
-        video.currentTime = 1; // seek to 1 second
+        video.onloadedmetadata = () => {
+            console.log('metadata loaded, duration:', video.duration, 'codec may be HEVC');
+            video.currentTime = 0.1; // seek to 0.1s to ensure we get a frame 
+        };
+
+        const cleanup = () => {
+            URL.revokeObjectURL(video.src);
+        }
+
+        const timeout = setTimeout(() => {
+            console.warn('Thumbnail generation timed out, possibly due to unsupported codec');
+            cleanup();
+            resolve(null); // resolve with null if thumbnail generation takes too long
+        }, 5000); // 5 second timeout
         
-        video.oncanplay = () => {
+        video.onseeked = () => {
+            console.log('seeked successfully, generating thumbnail');
+            clearTimeout(timeout);
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            
             canvas.toBlob((blob) => {
-                URL.revokeObjectURL(video.src); // cleanup memory
+                cleanup();
                 resolve(blob);
-            }, 'image/jpeg', 0.8);
+            }, 'image/jpeg', 0.75);
         };
+        video.onerror = () => {
+            console.error('video error:', video.error?.code, video.error?.message);
+            clearTimeout(timeout);
+            cleanup();
+            resolve(null); // resolve with null if there's an error loading the video
+        }
+
+        video.src = URL.createObjectURL(file);
+        video.load();
     });
 }
