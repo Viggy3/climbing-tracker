@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (thumb.classList.contains("video-wrapper")) {
                 // Video wrapper div - find the video inside
                 
-                 const videoElement = thumb.querySelector("video");
+                const videoElement = thumb.querySelector("video");
                 const videoSrc = videoElement.querySelector("source")?.src || videoElement.src;
                 
 
@@ -28,11 +28,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!existingVideo || existingVideo.querySelector("source")?.src !== videoSrc) {
                     modalContent.innerHTML = ""; // clear only if different video
 
-                    const wrapper = document.createElement("div");
-                    wrapper.style.position = "relative";
-                    wrapper.style.display = "inline-block";
+                    const closeBar = document.createElement("div");
+                    closeBar.style.cssText = `
+                        width: 100%;
+                        display: flex;
+                        justify-content: flex-end;
+                        padding: 5px;
+                        background: rgba(0, 0, 0, 0.5);
+                        border-radius: 5px 5px 0 0;
+                        `;
 
-                    
                     const closeBtn = document.createElement('button');
                         closeBtn.type = 'button';
                         closeBtn.className = 'media-remove-btn modal-close-btn';
@@ -43,6 +48,14 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (video) video.pause();
                             console.log("Closed modal for video:", videoSrc);
                     });
+
+                    closeBar.appendChild(closeBtn);
+
+                    const wrapper = document.createElement("div");
+                    wrapper.style.position = "relative";
+                    wrapper.style.display = "inline-block";
+
+                    
 
                     const video = document.createElement("video");
                     video.className = "modal-media";
@@ -57,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         video.appendChild(new_source);
                     });
                     wrapper.appendChild(video);
-                    wrapper.appendChild(closeBtn);
+                    modalContent.appendChild(closeBar);
                     modalContent.appendChild(wrapper);
                     // video.load();
     
