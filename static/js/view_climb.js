@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const wrapper = document.createElement("div");
                     wrapper.style.position = "relative";
+                    wrapper.style.display = "inline-block";
+
                     
                     const closeBtn = document.createElement('button');
                         closeBtn.type = 'button';
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             modal.classList.add("hidden");
                             const video = modalContent.querySelector("video");
                             if (video) video.pause();
+                            console.log("Closed modal for video:", videoSrc);
                     });
 
                     const video = document.createElement("video");
