@@ -22,17 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const videoSrc = videoElement.querySelector("source")?.src || videoElement.src;
                 
 
-                const closeBtn = document.createElement('button');
-                    closeBtn.type = 'button';
-                    closeBtn.className = 'media-remove-btn modal-close-btn';
-                    closeBtn.textContent = '×';
-                    closeBtn.addEventListener('click', () => {
-                        modal.classList.add("hidden");
-                        const video = modalContent.querySelector("video");
-                        if (video) video.pause();
-                });
-                modal.appendChild(closeBtn);
-
+                
                 // Only create if not already loaded with this src
                 const existingVideo = modalContent.querySelector("video");
                 if (!existingVideo || existingVideo.querySelector("source")?.src !== videoSrc) {
@@ -41,6 +31,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     video.className = "modal-media";
                     video.controls = true;
                     video.preload = "metadata";
+                    const closeBtn = document.createElement('button');
+                        closeBtn.type = 'button';
+                        closeBtn.className = 'media-remove-btn modal-close-btn';
+                        closeBtn.textContent = '×';
+                        closeBtn.addEventListener('click', () => {
+                            modal.classList.add("hidden");
+                            const video = modalContent.querySelector("video");
+                            if (video) video.pause();
+                    });
+                    video.appendChild(closeBtn);
                     const sources = videoElement.querySelectorAll("source");
                     sources.forEach(source => {
                         const new_source = document.createElement("source");
