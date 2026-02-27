@@ -267,6 +267,21 @@ input[type="checkbox"] {
     transform: translateY(-2px);
 }
 
+
+.modal-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 1;          /* always visible in modal */
+  transform: scale(1);
+  z-index: 10001;
+}
+
+.modal-close-btn:hover {
+  background-color: rgba(255, 82, 82, 0.95);
+  transform: scale(1.1);
+}
+
 /* Form Layout */
 form br {
     display: none; /* Remove line breaks, use margins instead */

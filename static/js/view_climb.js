@@ -21,6 +21,18 @@ document.addEventListener("DOMContentLoaded", () => {
                  const videoElement = thumb.querySelector("video");
                 const videoSrc = videoElement.querySelector("source")?.src || videoElement.src;
                 
+
+                const closeBtn = document.createElement('button');
+                    closeBtn.type = 'button';
+                    closeBtn.className = 'media-remove-btn modal-close-btn';
+                    closeBtn.textContent = '×';
+                    closeBtn.addEventListener('click', () => {
+                        modal.classList.add("hidden");
+                        const video = modalContent.querySelector("video");
+                        if (video) video.pause();
+                });
+                modal.appendChild(closeBtn);
+
                 // Only create if not already loaded with this src
                 const existingVideo = modalContent.querySelector("video");
                 if (!existingVideo || existingVideo.querySelector("source")?.src !== videoSrc) {
