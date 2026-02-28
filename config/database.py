@@ -27,7 +27,7 @@ db = client[DATABASE_NAME]
 trackers_collection = db[COLLECTION_NAME]  # Fixed: renamed from collection_name to collection
 users_collection = db["users"]  # Collection for user authentication data
 media_collection = db["media"]  # Collection for media files metadata
-
+pending_uploads_collection = db["pending_uploads"]
 
 def test_connection():
     """Test the MongoDB connection"""
