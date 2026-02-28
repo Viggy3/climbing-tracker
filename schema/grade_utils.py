@@ -65,5 +65,5 @@ def highest_grade(grades: Iterable[str]) -> Optional[str]:
 ['V7', '6c+', '7a', '5+', '8a+']
 
 # Example usage:
-print(highest_grade(['V7', '6c+', '7a', '5+', '8a+']))  # Output: '8a+'
+print(highest_grade(['V0']))  # Output: '8a+'
 print(highest_grade(['5', '4+', 'V2', '6a']))  # Output: '6a'

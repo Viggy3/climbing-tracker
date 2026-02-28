@@ -1,54 +1,109 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🧗 Climbing Tracker</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/new_tracker.css">
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-</head>
-<body class="body">
-     <div>
-        <h1>Welcome to My Climbing Tracker App</h1>
-    </div>
-    
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/new_tracker.css" />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+  </head>
+  <body class="body">
+    {% if not user %}
     <div>
-        <div>
-            <h2>Welcome</h2>
-            <div>
-                <p>This site is used to track your climbs. You can add new climbs and view your climbing history.</p>
-                <P>Many more features to come!</P>
-            </div>
-            <div>
-                <h2>Coming Soon</h2>
-            </div>
-            <div>
-                <ul>
-                    <li>Graphs showing ability changes over time</li>
-                    
-                </ul>
-            </div>
-            <h2>
-                RECENTLY ADDED FEATURES
-            </h2>
-            <div>
-                <ul>
-                    <li>Faster uploads for media files, any tips email myself: <a href="mailto:hari@hariviggy.com">hari@hariviggy.com</a></li>
-                    <li>Upload photos and videos to climbs</li>
-                    <li>Edit climb details after creation</li>
-                </ul>
-            </div>
-
-            <div>
-                <a href="/user/my_tracker" class="btn btn-primary">Go to Dashboard</a>
-            </div>
-        </div>
+      <h1>Welcome to My Climbing Tracker App</h1>
     </div>
 
-</body>
+    <div>
+      <h2>Welcome</h2>
+      <div>
+        <p>
+          This site is used to track your climbs. You can add new climbs and
+          view your climbing history.
+        </p>
+        <p>Many more features to come!</p>
+      </div>
+      <div>
+        <h2>Coming Soon</h2>
+      </div>
+      <div>
+        <ul>
+          <li>Graphs showing ability changes over time</li>
+        </ul>
+      </div>
+      <h2>RECENTLY ADDED FEATURES</h2>
+      <div>
+        <ul>
+          <li>
+            Faster uploads for media files, any tips email myself:
+            <a href="mailto:hari@hariviggy.com">hari@hariviggy.com</a>
+          </li>
+          <li>Upload photos and videos to climbs</li>
+          <li>Edit climb details after creation</li>
+        </ul>
+      </div>
+
+      <div>
+        <a href="/user/my_tracker" class="btn btn-primary">Go to Dashboard</a>
+      </div>
+    </div>
+
+    {% else %}
+    <section class="dashboard-wrap">
+      <h1 class="dashboard-title">Welcome back!</h1>
+
+      <div class="dashboard-stats">
+        <article class="dashboard-stat-card">
+          <p class="dashboard-stat-label">Highest Completed</p>
+          <p class="dashboard-stat-value">{{ completed_highest or "—" }}</p>
+        </article>
+
+        <article class="dashboard-stat-card">
+          <p class="dashboard-stat-label">Highest Attempted</p>
+          <p class="dashboard-stat-value">{{ attempted_highest or "—" }}</p>
+        </article>
+
+        <article class="dashboard-stat-card">
+          <p class="dashboard-stat-label">Total Completed</p>
+          <p class="dashboard-stat-value">{{ total_completed or 0 }}</p>
+        </article>
+      </div>
+
+      <section class="dashboard-recent">
+        <div class="dashboard-recent-head">
+          <h2>Recent Climbs</h2>
+          <a href="/user/my_tracker" class="dashboard-view-all">View All →</a>
+        </div>
+
+        {% if recent_climbs %}
+        <div class="dashboard-recent-grid">
+          {% for climb in recent_climbs[:3] %}
+          <article class="dashboard-climb-card">
+            <p class="dashboard-climb-grade">
+              {{ climb.get("name", "Unnamed Climb") }}
+            </p>
+            <span class="grade-badge">{{ climb.get("grade", "N/A") }}</span>
+            {% if climb.get("complete") %}
+            <p class="dashboard-climb-status done">✓ Done</p>
+            {% else %}
+            <p class="dashboard-climb-status progress">✗ In Prog</p>
+            {% endif %}
+            <a
+              href="/api/view_climb/{{ climb.get('_id') }}"
+              class="btn btn-secondary dashboard-climb-btn"
+              >View Details</a
+            >
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No climbs added yet. Start tracking your climbs now!</p>
+        {% endif %}
+      </section>
+    </section>
+    {% endif %}
+  </body>
 </html>
 {% endblock %}

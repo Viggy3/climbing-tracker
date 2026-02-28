@@ -1,10 +1,159 @@
 body {
-    font-family: Arial, sans-serif;
-    margin-left: 5%;
-    padding-left: 5%;
-    margin-right: 5%;
-    padding-right: 5%;
-    margin-top: 4%;
-    background-color: #021526;
-    color: #E2E2B6;
+  font-family: Arial, sans-serif;
+  margin-left: 5%;
+  padding-left: 5%;
+  margin-right: 5%;
+  padding-right: 5%;
+  margin-top: 4%;
+  background-color: #021526;
+  color: #e2e2b6;
+}
+
+/* Dashboard (logged-in home) */
+.dashboard-wrap {
+  max-width: 980px;
+  margin: 1.5rem auto;
+  padding: 1rem;
+  background: var(--secondary-bg, #03346e);
+  border: 2px solid var(--text-color, #e2e2b6);
+  border-radius: 12px;
+}
+
+.dashboard-title {
+  margin: 0 0 1rem 0;
+  color: var(--text-color, #e2e2b6);
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-stat-card {
+  background: rgba(2, 21, 38, 0.35);
+  border: 1px solid var(--tertiary-bg, #6eacda);
+  border-radius: 10px;
+  padding: 0.9rem;
+}
+
+.dashboard-stat-label {
+  margin: 0;
+  color: rgba(226, 226, 182, 0.85);
+  font-size: 0.9rem;
+}
+
+.dashboard-stat-value {
+  margin: 0.35rem 0 0;
+  color: var(--text-color, #e2e2b6);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.grade-badge {
+  background: #007bff;
+  color: white;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  position: absolute;
+  top: 0.45rem;
+  right: 0.5rem;
+}
+.dashboard-climb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.2rem;
+  padding: 0;
+}
+
+.dashboard-recent {
+  background: rgba(2, 21, 38, 0.35);
+  border: 1px solid var(--tertiary-bg, #6eacda);
+  border-radius: 10px;
+  padding: 0.9rem;
+}
+
+.dashboard-recent-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.dashboard-recent-head h2 {
+  margin: 0;
+}
+
+.dashboard-view-all {
+  color: var(--text-color, #e2e2b6);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.dashboard-view-all:hover {
+  text-decoration: underline;
+}
+
+.dashboard-recent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.dashboard-climb-card {
+  background: var(--primary-bg, #021526);
+  border: 1px solid var(--tertiary-bg, #6eacda);
+  border-radius: 8px;
+  padding: 0.5rem 0.55rem;
+  position: relative;
+}
+
+.dashboard-climb-grade {
+  margin: 0 3.1rem 0.25rem 0;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.dashboard-climb-status {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.dashboard-climb-btn {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.dashboard-climb-status.done {
+  color: #7ee787;
+}
+
+.dashboard-climb-status.progress {
+  color: #ffb86b;
+}
+
+@media (max-width: 900px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-recent-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-recent-grid {
+    grid-template-columns: 1fr;
+  }
 }

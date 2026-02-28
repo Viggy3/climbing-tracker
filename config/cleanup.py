@@ -8,6 +8,7 @@ async def cleanup_orphaned_uploads():
     orphaned_uploads = list(pending_uploads_collection.find({"created_at": {"$lt": cutoff}}))
     for upload in orphaned_uploads:
         real_doc = media_collection.find_one({"key": upload["key"]})
-        if not real_doc:
+        thumbnail_doc = media_collection.find_one({"key": upload["thumbnail_key"]}) if "thumbnail_key" in upload else None
+        if not real_doc and not thumbnail_doc:
             delete_from_r2(upload["key"])
             pending_uploads_collection.delete_one({"_id": upload["_id"]})
