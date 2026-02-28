@@ -59,11 +59,11 @@ def highest_grade(grades: Iterable[str]) -> Optional[str]:
         if index is not None and index > max_index:
             max_index = index
             best_grade = grade
-    return best_grade if max_index > 0 else None
+    return best_grade if max_index >= 0 else None
 
 
 ['V7', '6c+', '7a', '5+', '8a+']
 
 # Example usage:
-print(highest_grade(['V0']))  # Output: '8a+'
+print(highest_grade(['VB']))  # Output: '8a+'
 print(highest_grade(['5', '4+', 'V2', '6a']))  # Output: '6a'

@@ -51,7 +51,7 @@ body {
   font-weight: 700;
 }
 
-.grade-badge {
+.dashboard-climb-card .grade-badge {
   background: #007bff;
   color: white;
   padding: 2px 7px;
