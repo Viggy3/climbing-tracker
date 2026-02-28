@@ -13,6 +13,8 @@ from pymongo import MongoClient
 from contextlib import asynccontextmanager
 import fastapi_pagination
 from fastapi_pagination import add_pagination
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from config.cleanup import cleanup_orphaned_uploads
 load_dotenv()
 
 #check for secret key in .env
@@ -20,7 +22,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY environment variable is not set")
 
-
+scheduler = AsyncIOScheduler()
 app = FastAPI()
 
 # Create limiter — uses IP address as the key
@@ -48,18 +50,20 @@ async def lifespan(app: FastAPI ):
     users.create_index([("email", 1)], unique=True, sparse=True)
     users.create_index([("google_sub", 1)], unique=True, sparse=True)
     trackers.create_index([("user_id", 1), ("date", -1)])
-    print("✓ MongoDB indexes ensured.")
 
     #attach to app
     app.mongo_client = client
     app.database = db
 
-    print("FastAPI application started.")
+    # Start the scheduler for cleanup tasks
+    scheduler.add_job(cleanup_orphaned_uploads, 'interval', hours=1)
+    scheduler.start()
+
 
     try:
         yield
     finally:
-        print("Shutting down the FastAPI application...")
+        scheduler.shutdown()
         client.close()
         print("FastAPI application shut down.")
 

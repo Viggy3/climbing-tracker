@@ -1,9 +1,8 @@
-from config.r2_storage import  get_r2, upload_to_storage, delete_from_r2
-import token
+from config.r2_storage import  get_r2,delete_from_r2
 from config.limiter import limiter
 import hmac
 import hashlib
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from urllib.parse import quote
 import uuid
 from fastapi import APIRouter, Request, BackgroundTasks
@@ -14,7 +13,7 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
 from pathlib import Path
-from config.database import users_collection, update_user_login, check_user_exists, trackers_collection, media_collection
+from config.database import users_collection, update_user_login, check_user_exists, trackers_collection, media_collection, pending_uploads_collection
 import os
 import python_multipart
 from bson import ObjectId
@@ -80,6 +79,8 @@ async def create_tracker(request: Request, background_tasks: BackgroundTasks):
 
             result = media_collection.insert_one(media_doc)
             media_ids.append(result.inserted_id)
+
+            pending_uploads_collection.delete_one({"key": worker_url, "user_id": user_id})
 
         if media_ids:
             tracker_data["media_ids"] = media_ids
@@ -166,6 +167,9 @@ async def update_tracker(tracker_id: str, request: Request, background_tasks: Ba
             }
             result = media_collection.insert_one(media_doc)
             media_ids.append(result.inserted_id)
+
+
+            pending_uploads_collection.delete_one({"key": worker_url, "user_id": user_id})
 
         update_data = {
             "grade": body.get("edit_climb_grade"),
@@ -374,3 +378,23 @@ async def check_ffmpeg(request: Request):
         return JSONResponse({"available": True, "path": ffmpeg_path})
     except Exception as e:
         return JSONResponse({"available": False, "error": str(e)})
+    
+
+@api_router.post("/register_upload")
+async def register_upload(request: Request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JSONResponse({"error": "Not authenticated"}, status_code=401)
+
+    body = await request.json()
+    doc =  {
+        "key": body.get("key"),
+        "tracker_id": body.get("tracker_id"),
+        "filename": body.get("filename"),
+        "user_id": user_id,
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc)
+    }
+
+    pending_uploads_collection.insert_one(doc)
+    return JSONResponse({"success": True})
